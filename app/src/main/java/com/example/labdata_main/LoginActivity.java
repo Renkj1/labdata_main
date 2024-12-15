@@ -182,19 +182,32 @@ public class LoginActivity extends AppCompatActivity {
      * 处理登录成功
      */
     private void handleLoginSuccess(User user) {
-        // 保存登录状态
-        sharedPrefsManager.setLoggedInUserEmail(user.getEmail());
-        sharedPrefsManager.setLoggedInUserCompany(user.getCompany());
-
-        // 检查是否已初始化设备
-        if (databaseHelper.hasInitializedEquipment(user.getCompany())) {
-            // 已初始化，直接进入主页
-            startActivity(new Intent(this, MainActivity.class));
-        } else {
-            // 未初始化，进入设备初始化页面
-            startActivity(new Intent(this, EquipmentInitActivity.class));
+        try {
+            // 保存登录状态
+            sharedPrefsManager.saveUserLoginSession(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getCompany(),
+                user.getPhone()
+            );
+            
+            // 检查是否已初始化设备
+            if (databaseHelper.hasInitializedEquipment(user.getCompany())) {
+                // 已初始化，直接进入主页
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+            } else {
+                // 未初始化，进入设备初始化引导页面
+                Intent intent = new Intent(LoginActivity.this, EquipmentGuideActivity.class);
+                intent.putExtra("company_id", user.getCompany());
+                startActivity(intent);
+            }
+            finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "系统错误，请稍后重试", Toast.LENGTH_SHORT).show();
         }
-        finish();
     }
 
     /**

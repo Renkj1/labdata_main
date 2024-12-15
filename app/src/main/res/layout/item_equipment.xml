@@ -3,16 +3,54 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="12dp"
-    android:layout_marginBottom="8dp"
+    android:padding="16dp"
+    android:layout_marginTop="8dp"
     android:background="@drawable/input_background">
 
-    <TextView
-        android:id="@+id/tvEquipmentInfo"
+    <Spinner
+        android:id="@+id/spinnerManufacturer"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@null"
+        android:spinnerMode="dropdown" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#EEEEEE"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <Spinner
+        android:id="@+id/spinnerModel"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@null"
+        android:spinnerMode="dropdown" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#EEEEEE"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/etPurchaseYear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#333333"
-        android:textSize="14sp"
-        android:lineSpacingExtra="4dp" />
+        android:hint="购买年限"
+        android:inputType="number"
+        android:background="@null"
+        android:padding="8dp"/>
+
+    <Button
+        android:id="@+id/btnDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:text="删除"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:textColor="#FF0000"/>
 
 </LinearLayout>
