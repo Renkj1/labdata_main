@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 主菜单项: 混合料实验 -->
+    <item
+        android:id="@+id/itemMixExperiment"
+        android:title="混合料实验"
+        app:showAsAction="never" />  <!-- 默认显示为菜单项 -->
+
+    <!-- 主菜单项: 沥青性能检测 -->
+    <item
+        android:id="@+id/itemAsphaltTesting"
+        android:title="沥青性能检测"
+        app:showAsAction="never" />  <!-- 默认显示为菜单项 -->
+
+    <!-- 如果需要，您还可以添加更多菜单项 -->
+    <item
+        android:id="@+id/itemMoreOptions"
+        android:title="更多选项"
+        app:showAsAction="never" />
+
+    <!-- 分隔线，帮助区分不同的菜单项 -->
+    <item android:title="更多设置" android:enabled="false" android:icon="@android:drawable/divider_horizontal_bright"/>
+</menu>
