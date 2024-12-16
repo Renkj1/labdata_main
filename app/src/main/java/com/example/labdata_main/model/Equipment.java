@@ -1,6 +1,9 @@
 package com.example.labdata_main.model;
 
-public class Equipment {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Equipment implements Parcelable {
     private int id;
     private String companyId;  // 归属单位ID
     private String type;       // 设备类型：MIXING(拌合), FORMING(制件), TESTING(实验)
@@ -18,6 +21,27 @@ public class Equipment {
         this.manufacturer = manufacturer;
         this.purchaseYear = purchaseYear;
     }
+
+    protected Equipment(Parcel in) {
+        id = in.readInt();
+        companyId = in.readString();
+        type = in.readString();
+        model = in.readString();
+        manufacturer = in.readString();
+        purchaseYear = in.readString();
+    }
+
+    public static final Creator<Equipment> CREATOR = new Creator<Equipment>() {
+        @Override
+        public Equipment createFromParcel(Parcel in) {
+            return new Equipment(in);
+        }
+
+        @Override
+        public Equipment[] newArray(int size) {
+            return new Equipment[size];
+        }
+    };
 
     // Getters and Setters
     public int getId() {
@@ -66,5 +90,20 @@ public class Equipment {
 
     public void setPurchaseYear(String purchaseYear) {
         this.purchaseYear = purchaseYear;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(companyId);
+        dest.writeString(type);
+        dest.writeString(model);
+        dest.writeString(manufacturer);
+        dest.writeString(purchaseYear);
     }
 }

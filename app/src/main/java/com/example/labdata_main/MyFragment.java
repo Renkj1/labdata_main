@@ -267,6 +267,8 @@ public class MyFragment extends Fragment {
         loadAvatar(); // 立即重新加载头像
     }
 
+
+
     private void cropImage(Uri sourceUri) {
         Log.d("MyFragment", "开始裁剪图片，源URI: " + sourceUri);
         

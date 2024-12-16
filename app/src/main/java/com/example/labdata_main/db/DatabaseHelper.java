@@ -302,4 +302,51 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return equipmentList;
     }
+
+    // 根据公司ID获取所有设备
+    public List<Equipment> getEquipmentsByCompanyId(String companyId) {
+        List<Equipment> equipmentList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            Log.d(TAG, "Getting equipment for company: " + companyId);
+            
+            cursor = db.query(TABLE_EQUIPMENT,
+                null,  // 获取所有列
+                COLUMN_COMPANY_ID + "=?",
+                new String[]{companyId},
+                null, null, null);
+
+            Log.d(TAG, "Query executed, cursor count: " + (cursor != null ? cursor.getCount() : "null"));
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    Equipment equipment = new Equipment();
+                    equipment.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_ID)));
+                    equipment.setCompanyId(cursor.getString(cursor.getColumnIndex(COLUMN_COMPANY_ID)));
+                    equipment.setType(cursor.getString(cursor.getColumnIndex(COLUMN_TYPE)));
+                    equipment.setModel(cursor.getString(cursor.getColumnIndex(COLUMN_MODEL)));
+                    equipment.setManufacturer(cursor.getString(cursor.getColumnIndex(COLUMN_MANUFACTURER)));
+                    equipment.setPurchaseYear(cursor.getString(cursor.getColumnIndex(COLUMN_PURCHASE_YEAR)));
+                    equipmentList.add(equipment);
+                    
+                    Log.d(TAG, String.format("Added equipment: ID=%d, Type=%s, Model=%s",
+                        equipment.getId(), equipment.getType(), equipment.getModel()));
+                } while (cursor.moveToNext());
+            } else {
+                Log.w(TAG, "No equipment found for company: " + companyId);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting equipment: " + e.getMessage(), e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+
+        Log.d(TAG, "Returning equipment list with size: " + equipmentList.size());
+        return equipmentList;
+    }
 }

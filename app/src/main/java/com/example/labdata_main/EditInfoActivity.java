@@ -1,19 +1,22 @@
 package com.example.labdata_main;
 
 import android.os.Bundle;
-import android.widget.Button;
+import android.text.TextUtils;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
-import com.example.labdata_main.utils.SharedPrefsManager;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.example.labdata_main.utils.SharedPrefsManager;
 
 public class EditInfoActivity extends AppCompatActivity {
     private TextInputEditText etName;
     private TextInputEditText etPhone;
     private TextInputEditText etCompany;
-    private Button btnSave;
+    private MaterialButton btnSave;
     private SharedPrefsManager sharedPrefsManager;
 
     @Override
@@ -21,17 +24,20 @@ public class EditInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_info);
 
-        // 初始化 SharedPrefsManager
-        sharedPrefsManager = new SharedPrefsManager(this);
+        // 初始化 Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
-        // 初始化视图
+        // 初始化控件
         initViews();
-        
-        // 加载当前用户信息
-        loadUserInfo();
-
-        // 设置保存按钮点击事件
-        btnSave.setOnClickListener(v -> saveUserInfo());
+        // 设置点击事件
+        setClickListeners();
+        // 加载现有信息
+        loadExistingInfo();
     }
 
     private void initViews() {
@@ -39,12 +45,27 @@ public class EditInfoActivity extends AppCompatActivity {
         etPhone = findViewById(R.id.etPhone);
         etCompany = findViewById(R.id.etCompany);
         btnSave = findViewById(R.id.btnSave);
+        sharedPrefsManager = new SharedPrefsManager(this);
     }
 
-    private void loadUserInfo() {
-        etName.setText(sharedPrefsManager.getUserName());
-        etPhone.setText(sharedPrefsManager.getUserPhone());
-        etCompany.setText(sharedPrefsManager.getUserCompany());
+    private void setClickListeners() {
+        btnSave.setOnClickListener(v -> saveUserInfo());
+    }
+
+    private void loadExistingInfo() {
+        String name = sharedPrefsManager.getUserName();
+        String phone = sharedPrefsManager.getUserPhone();
+        String company = sharedPrefsManager.getUserCompany();
+
+        if (!TextUtils.isEmpty(name)) {
+            etName.setText(name);
+        }
+        if (!TextUtils.isEmpty(phone)) {
+            etPhone.setText(phone);
+        }
+        if (!TextUtils.isEmpty(company)) {
+            etCompany.setText(company);
+        }
     }
 
     private void saveUserInfo() {
@@ -52,8 +73,7 @@ public class EditInfoActivity extends AppCompatActivity {
         String phone = etPhone.getText().toString().trim();
         String company = etCompany.getText().toString().trim();
 
-        // 验证输入
-        if (name.isEmpty()) {
+        if (TextUtils.isEmpty(name)) {
             etName.setError("请输入姓名");
             return;
         }
@@ -65,5 +85,14 @@ public class EditInfoActivity extends AppCompatActivity {
 
         Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
         finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

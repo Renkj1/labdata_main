@@ -131,5 +131,7 @@
             android:text="注销"
             android:textColor="@color/white"
             android:backgroundTint="@color/blue_theme" />
+
+
     </LinearLayout>
 </LinearLayout>

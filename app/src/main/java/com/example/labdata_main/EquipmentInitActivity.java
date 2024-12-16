@@ -149,14 +149,29 @@ public class EquipmentInitActivity extends AppCompatActivity {
             }
 
             if (success) {
-                Toast.makeText(this, "设备信息保存成功", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
+                finishInit();
             } else {
                 Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
             }
+        }
+    }
+
+    private void finishInit() {
+        try {
+            Log.d("EquipmentInit", "Starting finishInit()");
+            // 从数据库获取所有设备信息
+            ArrayList<Equipment> equipmentList = new ArrayList<>(databaseHelper.getEquipmentsByCompanyId(companyId));
+            Log.d("EquipmentInit", "Got equipment list, size: " + equipmentList.size());
+            
+            // 跳转到二维码显示界面
+            Intent intent = new Intent(this, QRCodeDisplayActivity.class);
+            intent.putParcelableArrayListExtra("equipment_list", equipmentList);
+            Log.d("EquipmentInit", "Starting QRCodeDisplayActivity");
+            startActivity(intent);
+            finish();
+        } catch (Exception e) {
+            Log.e("EquipmentInit", "Error in finishInit: " + e.getMessage(), e);
+            Toast.makeText(this, "初始化失败: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
