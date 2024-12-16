@@ -18,6 +18,7 @@ public class SharedPrefsManager {
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_USER_COMPANY = "userCompany";
     private static final String KEY_USER_PHONE = "userPhone";
+    private static final String KEY_USER_AVATAR = "userAvatar";
 
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences.Editor editor;
@@ -103,5 +104,49 @@ public class SharedPrefsManager {
      */
     public String getUserPhone() {
         return sharedPreferences.getString(KEY_USER_PHONE, null);
+    }
+
+    /**
+     * 保存用户姓名
+     * @param name 用户姓名
+     */
+    public void saveUserName(String name) {
+        editor.putString(KEY_USER_NAME, name);
+        editor.apply();
+    }
+
+    /**
+     * 保存用户单位
+     * @param company 用户单位
+     */
+    public void saveUserCompany(String company) {
+        editor.putString(KEY_USER_COMPANY, company);
+        editor.apply();
+    }
+
+    /**
+     * 保存用户电话
+     * @param phone 用户电话
+     */
+    public void saveUserPhone(String phone) {
+        editor.putString(KEY_USER_PHONE, phone);
+        editor.apply();
+    }
+
+    /**
+     * 保存用户头像URI
+     * @param uri 头像图片的URI
+     */
+    public void saveAvatarUri(String uri) {
+        editor.putString(KEY_USER_AVATAR, uri);
+        editor.apply();
+    }
+
+    /**
+     * 获取用户头像URI
+     * @return 头像图片的URI，如果未设置则返回null
+     */
+    public String getAvatarUri() {
+        return sharedPreferences.getString(KEY_USER_AVATAR, null);
     }
 }
