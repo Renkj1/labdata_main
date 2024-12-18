@@ -24,7 +24,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.labdata_main.utils.SharedPrefsManager;
 
 import java.io.File;
@@ -244,11 +245,11 @@ public class MyFragment extends Fragment {
                 Uri uri = Uri.parse(avatarUri);
                 Log.d("MyFragment", "Loading avatar from URI: " + uri);
                 
-                Picasso.get()
-                       .load(uri)
-                       .placeholder(R.drawable.circle_avatar_background)
-                       .error(R.drawable.circle_avatar_background)
-                       .into(ivAvatar);
+                Glide.with(requireContext())
+                        .load(uri)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true)
+                        .into(ivAvatar);
                      
             } catch (Exception e) {
                 Log.e("MyFragment", "Error loading avatar: " + e.getMessage());
@@ -266,8 +267,6 @@ public class MyFragment extends Fragment {
         sharedPrefsManager.saveAvatarUri(uri);
         loadAvatar(); // 立即重新加载头像
     }
-
-
 
     private void cropImage(Uri sourceUri) {
         Log.d("MyFragment", "开始裁剪图片，源URI: " + sourceUri);
