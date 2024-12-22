@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_background"
+    android:padding="16dp">
+
+    <ImageButton
+        android:id="@+id/btnClose"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_close" />
+
+    <!-- 流程标题 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/tvProcessTitle1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="制件方式"
+            android:textSize="18sp"
+            android:textColor="#1684FC" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginHorizontal="8dp"
+            android:src="@drawable/ic_arrow_right" />
+
+        <TextView
+            android:id="@+id/tvProcessTitle2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="切割属性"
+            android:textSize="18sp"
+            android:textColor="#DCDCDC" />
+    </LinearLayout>
+
+    <!-- 制件方式流程内容 -->
+    <LinearLayout
+        android:id="@+id/layoutProcessContent1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="24dp">
+
+        <!-- 拌合部分 -->
+        <TextView
+            android:id="@+id/btnMixing"
+            android:layout_width="145dp"
+            android:layout_height="48dp"
+            android:text="拌合"
+            android:textColor="#1684FC"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:background="@drawable/process_button_background"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 击实部分 -->
+        <TextView
+            android:id="@+id/btnCompaction"
+            android:layout_width="145dp"
+            android:layout_height="48dp"
+            android:text="击实"
+            android:textColor="#1684FC"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:background="@drawable/process_button_background" />
+    </LinearLayout>
+
+    <!-- 切割属性流程内容 -->
+    <LinearLayout
+        android:id="@+id/layoutProcessContent2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="24dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/btnRectangle"
+            android:layout_width="145dp"
+            android:layout_height="48dp"
+            android:text="长方体"
+            android:textColor="#1684FC"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:background="@drawable/process_button_background"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/btnCylinder"
+            android:layout_width="145dp"
+            android:layout_height="48dp"
+            android:text="圆柱体"
+            android:textColor="#1684FC"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:background="@drawable/process_button_background"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/btnSemiCircle"
+            android:layout_width="145dp"
+            android:layout_height="48dp"
+            android:text="半圆形"
+            android:textColor="#1684FC"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:background="@drawable/process_button_background" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnNext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="下一步"
+        android:enabled="false"
+        android:backgroundTint="#1684FC"
+        android:layout_marginTop="32dp" />
+
+</LinearLayout>

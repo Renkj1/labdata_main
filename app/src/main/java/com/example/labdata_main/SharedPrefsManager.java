@@ -89,4 +89,16 @@ public class SharedPrefsManager {
     public int getUserType() {
         return sharedPreferences.getInt(KEY_USER_TYPE, 0);  // 默认返回0（实验员）
     }
+
+    public static void saveString(Context context, String key, String value) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(key, value);
+        editor.apply();
+    }
+
+    public static String getString(Context context, String key, String defaultValue) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(key, defaultValue);
+    }
 }

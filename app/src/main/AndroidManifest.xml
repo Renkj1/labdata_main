@@ -48,6 +48,8 @@
         <activity android:name=".AssignTaskActivity" />
         <activity android:name=".AddDeviceActivity" />
         <activity android:name=".SelectRatioActivity" />
+        <activity android:name=".ManufacturingMethodActivity" />
+        <activity android:name=".ExperimentDesignActivity" />
 
     </application>
 

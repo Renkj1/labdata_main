@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="原料配比 \u2192 制件方式 \u2192 实验定制"
+        android:text="原料配比 → 制件方式 → 实验定制"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="选择配比"
+        android:text="实验定制"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -49,61 +49,15 @@
         app:layout_constraintTop_toBottomOf="@+id/tvProgress" />
 
     <LinearLayout
-        android:id="@+id/layoutButtons"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="16dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/btnNext"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle">
 
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+        <!-- 这里可以添加实验定制界面的具体内容 -->
 
-            <RadioButton
-                android:id="@+id/btnRatio1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="配比一"
-                android:button="@null"
-                android:background="@drawable/radio_button_background"
-                android:padding="12dp"
-                android:gravity="center" />
-
-            <RadioButton
-                android:id="@+id/btnRatio2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="配比二"
-                android:button="@null"
-                android:background="@drawable/radio_button_background"
-                android:padding="12dp"
-                android:gravity="center" />
-
-            <RadioButton
-                android:id="@+id/btnAddRatio"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="添加配比"
-                android:button="@null"
-                android:background="@drawable/radio_button_background"
-                android:padding="12dp"
-                android:gravity="center" />
-        </RadioGroup>
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btnNext"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="下一个"
-        android:enabled="false"
-        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

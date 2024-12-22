@@ -41,69 +41,63 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="选择配比"
+        android:text="制件方式"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvProgress" />
 
-    <LinearLayout
-        android:id="@+id/layoutButtons"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_margin="16dp"
-        android:orientation="vertical"
+    <TextView
+        android:id="@+id/tvAddSpecimen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="添加试件"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#1684FC"
+        app:layout_constraintBottom_toTopOf="@+id/btnAddSpecimen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <ImageButton
+        android:id="@+id/btnAddSpecimen"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/circle_background"
+        android:src="@drawable/ic_add"
+        android:padding="16dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/tvExperimentFlow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAddSpecimen" />
+
+    <TextView
+        android:id="@+id/tvExperimentFlow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:text="实验流程图"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#1684FC"
         app:layout_constraintBottom_toTopOf="@+id/btnNext"
-        app:layout_constraintTop_toBottomOf="@+id/tvTitle">
-
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <RadioButton
-                android:id="@+id/btnRatio1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="配比一"
-                android:button="@null"
-                android:background="@drawable/radio_button_background"
-                android:padding="12dp"
-                android:gravity="center" />
-
-            <RadioButton
-                android:id="@+id/btnRatio2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="配比二"
-                android:button="@null"
-                android:background="@drawable/radio_button_background"
-                android:padding="12dp"
-                android:gravity="center" />
-
-            <RadioButton
-                android:id="@+id/btnAddRatio"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="添加配比"
-                android:button="@null"
-                android:background="@drawable/radio_button_background"
-                android:padding="12dp"
-                android:gravity="center" />
-        </RadioGroup>
-    </LinearLayout>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btnNext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="下一个"
+        android:text="下一步"
         android:enabled="false"
+        android:backgroundTint="#1684FC"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
