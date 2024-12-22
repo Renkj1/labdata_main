@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.RadioGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -29,6 +30,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText etConfirmPassword;
     private Button btnRegister;
     private TextView tvLogin;
+    private RadioGroup rgUserType;
 
     private DatabaseHelper databaseHelper;
     private SharedPrefsManager sharedPrefsManager;
@@ -65,6 +67,7 @@ public class RegisterActivity extends AppCompatActivity {
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnRegister = findViewById(R.id.btnRegister);
         tvLogin = findViewById(R.id.tvLogin);
+        rgUserType = findViewById(R.id.rgUserType);
     }
 
     /**
@@ -186,12 +189,16 @@ public class RegisterActivity extends AppCompatActivity {
      * 尝试注册
      */
     private void attemptRegister() {
+        // 获取输入的用户信息
         String company = etCompany.getText().toString().trim();
         String name = etName.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
+
+        // 获取选择的用户类型
+        int userType = rgUserType.getCheckedRadioButtonId() == R.id.rbAdmin ? 1 : 0;
 
         // 验证必填字段
         if (TextUtils.isEmpty(company)) {
@@ -248,6 +255,7 @@ public class RegisterActivity extends AppCompatActivity {
         user.setPhone(phone);
         user.setEmail(email);
         user.setPassword(password);
+        user.setUserType(userType);  // 设置用户类型
 
         // 保存用户信息到数据库
         long id = databaseHelper.addUser(user);
@@ -258,7 +266,8 @@ public class RegisterActivity extends AppCompatActivity {
                 email,
                 name,
                 company,
-                phone
+                phone,
+                userType  // 添加用户类型
             );
             Toast.makeText(this, "注册成功", Toast.LENGTH_SHORT).show();
             finish();

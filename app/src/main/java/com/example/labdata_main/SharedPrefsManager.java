@@ -13,7 +13,8 @@ public class SharedPrefsManager {
     private static final String PREFS_NAME = "LabDataPrefs";
     private static final String KEY_EQUIPMENT_LIST = "equipment_list";
     private static final String KEY_INITIALIZED = "initialized";
-    
+    private static final String KEY_USER_TYPE = "user_type";  // 添加用户类型的key
+
     private final SharedPreferences sharedPreferences;
     private final Gson gson;
 
@@ -52,5 +53,40 @@ public class SharedPrefsManager {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
+    }
+
+    public void saveUserLoginSession(int id, String email, String name, String company, String phone, int userType) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("id", id);
+        editor.putString("email", email);
+        editor.putString("name", name);
+        editor.putString("company", company);
+        editor.putString("phone", phone);
+        editor.putInt(KEY_USER_TYPE, userType);  // 保存用户类型
+        editor.apply();
+    }
+
+    public String getUserName() {
+        return sharedPreferences.getString("name", "");
+    }
+
+    public String getUserEmail() {
+        return sharedPreferences.getString("email", "");
+    }
+
+    public String getUserPhone() {
+        return sharedPreferences.getString("phone", "");
+    }
+
+    public String getUserCompany() {
+        return sharedPreferences.getString("company", "");
+    }
+
+    public int getUserId() {
+        return sharedPreferences.getInt("id", -1);
+    }
+
+    public int getUserType() {
+        return sharedPreferences.getInt(KEY_USER_TYPE, 0);  // 默认返回0（实验员）
     }
 }

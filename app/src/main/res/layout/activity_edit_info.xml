@@ -110,10 +110,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="24dp"
+                android:backgroundTint="@color/blue_theme"
                 android:text="保存修改"
                 android:textSize="16sp"
-                app:cornerRadius="28dp"
-                android:backgroundTint="@color/blue_theme" />
+                app:cornerRadius="28dp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

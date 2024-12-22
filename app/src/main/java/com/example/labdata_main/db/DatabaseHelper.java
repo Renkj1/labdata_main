@@ -9,6 +9,8 @@ import android.util.Log;
 
 import com.example.labdata_main.model.User;
 import com.example.labdata_main.model.Equipment;
+import com.example.labdata_main.model.Experimenter;
+import com.example.labdata_main.model.Project;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     
     // 数据库名称和版本
     private static final String DATABASE_NAME = "UserDB";
-    private static final int DATABASE_VERSION = 2; // 增加版本号以触发数据库升级
 
     // 用户表
     private static final String TABLE_USERS = "users";
@@ -32,6 +33,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PHONE = "phone";
     private static final String COLUMN_EMAIL = "email";
     private static final String COLUMN_PASSWORD = "password";
+    
+    // 添加用户类型列常量
+    private static final String COLUMN_USER_TYPE = "user_type";
+
+    // 权限相关的表
+    private static final String TABLE_PERMISSIONS = "permissions";
+    private static final String COLUMN_EXPERIMENTER_ID = "experimenter_id";
+    private static final String COLUMN_CAN_ASSIGN_TASKS = "can_assign_tasks";
+    private static final String COLUMN_CAN_MANAGE_DEVICES = "can_manage_devices";
+
+    private static final String TABLE_PROJECT_ACCESS = "project_access";
+    private static final String COLUMN_PROJECT_ID = "project_id";
+    private static final String COLUMN_HAS_ACCESS = "has_access";
+
+    private static final String TABLE_PROJECTS = "projects";
+    private static final String COLUMN_PROJECT_NAME = "project_name";
 
     // 设备表
     private static final String TABLE_EQUIPMENT = "equipment";
@@ -41,6 +58,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_MANUFACTURER = "manufacturer";
     private static final String COLUMN_PURCHASE_YEAR = "purchase_year";
 
+    // 修改数据库版本号，触发升级
+    private static final int DATABASE_VERSION = 3; // 从2升级到3
+    
     // 创建用户表的 SQL
     private static final String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS + "("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -48,7 +68,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_NAME + " TEXT,"
             + COLUMN_PHONE + " TEXT,"
             + COLUMN_EMAIL + " TEXT UNIQUE,"
-            + COLUMN_PASSWORD + " TEXT"
+            + COLUMN_PASSWORD + " TEXT,"  // 添加逗号
+            + COLUMN_USER_TYPE + " INTEGER DEFAULT 0"
             + ")";
 
     // 创建设备表的 SQL
@@ -61,6 +82,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_PURCHASE_YEAR + " TEXT NOT NULL, "
             + "FOREIGN KEY(" + COLUMN_COMPANY_ID + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_COMPANY + ") "
             + "ON DELETE CASCADE ON UPDATE CASCADE)";
+
+    // 创建权限表的 SQL
+    private static final String CREATE_PERMISSIONS_TABLE = "CREATE TABLE " + TABLE_PERMISSIONS + "("
+            + COLUMN_EXPERIMENTER_ID + " INTEGER,"
+            + COLUMN_CAN_ASSIGN_TASKS + " INTEGER DEFAULT 0,"
+            + COLUMN_CAN_MANAGE_DEVICES + " INTEGER DEFAULT 0,"
+            + "PRIMARY KEY (" + COLUMN_EXPERIMENTER_ID + "))";
+
+    // 创建项目表的 SQL
+    private static final String CREATE_PROJECTS_TABLE = "CREATE TABLE " + TABLE_PROJECTS + "("
+            + COLUMN_PROJECT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_PROJECT_NAME + " TEXT NOT NULL)";
+
+    // 创建项目访问权限表的 SQL
+    private static final String CREATE_PROJECT_ACCESS_TABLE = "CREATE TABLE " + TABLE_PROJECT_ACCESS + "("
+            + COLUMN_EXPERIMENTER_ID + " INTEGER,"
+            + COLUMN_PROJECT_ID + " INTEGER,"
+            + COLUMN_HAS_ACCESS + " INTEGER DEFAULT 0,"
+            + "PRIMARY KEY (" + COLUMN_EXPERIMENTER_ID + ", " + COLUMN_PROJECT_ID + "))";
 
     /**
      * 构造函数
@@ -82,6 +122,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // 创建设备表
             db.execSQL(CREATE_EQUIPMENT_TABLE);
             Log.d(TAG, "Equipment table created successfully");
+
+            // 创建权限表
+            db.execSQL(CREATE_PERMISSIONS_TABLE);
+            Log.d(TAG, "Permissions table created successfully");
+
+            // 创建项目表
+            db.execSQL(CREATE_PROJECTS_TABLE);
+            Log.d(TAG, "Projects table created successfully");
+
+            // 创建项目访问权限表
+            db.execSQL(CREATE_PROJECT_ACCESS_TABLE);
+            Log.d(TAG, "Project access table created successfully");
         } catch (Exception e) {
             Log.e(TAG, "Error creating tables: " + e.getMessage());
             e.printStackTrace();
@@ -91,18 +143,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.d(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
-        try {
-            db.execSQL("PRAGMA foreign_keys=ON");
-            // 删除旧表
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_EQUIPMENT);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
-            Log.d(TAG, "Old tables dropped successfully");
+    
+        // 检查是否需要从版本2升级到版本3
+        if (oldVersion < 3) {
+           try {
+               // 启用外键支持
+               db.execSQL("PRAGMA foreign_keys=ON");
             
-            // 创建新表
-            onCreate(db);
-        } catch (Exception e) {
-            Log.e(TAG, "Error upgrading database: " + e.getMessage());
-            e.printStackTrace();
+               // 添加用户类型列，默认值为0（普通用户）
+               String alterTableSQL = "ALTER TABLE " + TABLE_USERS + 
+                                      " ADD COLUMN " + COLUMN_USER_TYPE + 
+                                      " INTEGER DEFAULT 0";
+            
+                // 执行添加列的SQL语句
+                db.execSQL(alterTableSQL);
+            
+                // 记录成功日志
+                Log.d(TAG, "Successfully added user_type column to users table");
+            
+            } catch (Exception e) {
+                // 记录错误日志
+                Log.e(TAG, "Error during database upgrade: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -126,7 +189,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_PHONE, user.getPhone());
         values.put(COLUMN_EMAIL, user.getEmail());
         values.put(COLUMN_PASSWORD, user.getPassword());
-
+        values.put(COLUMN_USER_TYPE, user.getUserType()); // 添加用户类型
         // 插入数据并获取返回值
         long id = db.insert(TABLE_USERS, null, values);
         db.close();
@@ -348,5 +411,176 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         Log.d(TAG, "Returning equipment list with size: " + equipmentList.size());
         return equipmentList;
+    }
+
+    // 根据邮箱和用户类型查询用户
+    public User getUserByEmailAndType(String email, int userType) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        User user = null;
+        Cursor cursor = null;
+
+        try {
+            String[] columns = {
+                COLUMN_ID, COLUMN_COMPANY, COLUMN_NAME, 
+                COLUMN_PHONE, COLUMN_EMAIL, COLUMN_PASSWORD, 
+                COLUMN_USER_TYPE
+            };
+            
+            String selection = COLUMN_EMAIL + " = ? AND " + COLUMN_USER_TYPE + " = ?";
+            String[] selectionArgs = {email, String.valueOf(userType)};
+            
+            cursor = db.query(TABLE_USERS, columns, selection, selectionArgs, 
+                           null, null, null);
+            
+            if (cursor != null && cursor.moveToFirst()) {
+                user = new User();
+                user.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_ID)));
+                user.setCompany(cursor.getString(cursor.getColumnIndex(COLUMN_COMPANY)));
+                user.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)));
+                user.setPhone(cursor.getString(cursor.getColumnIndex(COLUMN_PHONE)));
+                user.setEmail(cursor.getString(cursor.getColumnIndex(COLUMN_EMAIL)));
+                user.setPassword(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)));
+                user.setUserType(cursor.getInt(cursor.getColumnIndex(COLUMN_USER_TYPE)));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error querying user by email and type: " + e.getMessage(), e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        return user;
+    }
+
+    /**
+     * 根据邮箱获取用户类型
+     * @param email 用户邮箱
+     * @return 用户类型（0表示实验员，1表示管理员）
+     */
+    public int getUserTypeByEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int userType = 0;  // 默认为实验员
+
+        Cursor cursor = db.query(TABLE_USERS,
+                new String[]{COLUMN_USER_TYPE},
+                COLUMN_EMAIL + "=?",
+                new String[]{email},
+                null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            userType = cursor.getInt(0);
+            cursor.close();
+        }
+        db.close();
+        return userType;
+    }
+
+    // 获取所有实验员
+    public List<Experimenter> getAllExperimenters() {
+        List<Experimenter> experimenters = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_USERS,
+                new String[]{COLUMN_ID, COLUMN_NAME},
+                COLUMN_USER_TYPE + "=?",
+                new String[]{"0"},  // 0 表示实验员
+                null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(0);
+                String name = cursor.getString(1);
+                Experimenter experimenter = new Experimenter(id, name);
+                
+                // 获取权限信息
+                Cursor permissionCursor = db.query(TABLE_PERMISSIONS,
+                        new String[]{COLUMN_CAN_ASSIGN_TASKS, COLUMN_CAN_MANAGE_DEVICES},
+                        COLUMN_EXPERIMENTER_ID + "=?",
+                        new String[]{String.valueOf(id)},
+                        null, null, null);
+
+                if (permissionCursor != null && permissionCursor.moveToFirst()) {
+                    experimenter.setCanAssignTasks(permissionCursor.getInt(0) == 1);
+                    experimenter.setCanManageDevices(permissionCursor.getInt(1) == 1);
+                    permissionCursor.close();
+                }
+
+                experimenters.add(experimenter);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return experimenters;
+    }
+
+    // 更新实验员权限
+    public void updateExperimenterPermissions(int experimenterId, boolean canAssignTasks, boolean canManageDevices) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_CAN_ASSIGN_TASKS, canAssignTasks ? 1 : 0);
+        values.put(COLUMN_CAN_MANAGE_DEVICES, canManageDevices ? 1 : 0);
+
+        db.replace(TABLE_PERMISSIONS,
+                null,
+                values);
+    }
+
+    // 获取所有项目
+    public List<Project> getAllProjects() {
+        List<Project> projects = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_PROJECTS,
+                new String[]{COLUMN_PROJECT_ID, COLUMN_PROJECT_NAME},
+                null, null, null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(0);
+                String name = cursor.getString(1);
+                projects.add(new Project(id, name, false)); // 添加默认访问权限为false
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return projects;
+    }
+
+    // 获取实验员的项目访问权限
+    public List<Project> getExperimenterProjects(int experimenterId) {
+        List<Project> projects = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT p." + COLUMN_PROJECT_ID + ", p." + COLUMN_PROJECT_NAME + 
+                      ", COALESCE(pa." + COLUMN_HAS_ACCESS + ", 0) as has_access" +
+                      " FROM " + TABLE_PROJECTS + " p" +
+                      " LEFT JOIN " + TABLE_PROJECT_ACCESS + " pa" +
+                      " ON p." + COLUMN_PROJECT_ID + " = pa." + COLUMN_PROJECT_ID +
+                      " AND pa." + COLUMN_EXPERIMENTER_ID + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(experimenterId)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(0);
+                String name = cursor.getString(1);
+                boolean hasAccess = cursor.getInt(2) == 1;
+                projects.add(new Project(id, name, hasAccess));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return projects;
+    }
+
+    // 更新项目访问权限
+    public void updateProjectAccess(int experimenterId, int projectId, boolean hasAccess) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_EXPERIMENTER_ID, experimenterId);
+        values.put(COLUMN_PROJECT_ID, projectId);
+        values.put(COLUMN_HAS_ACCESS, hasAccess ? 1 : 0);
+
+        db.replace(TABLE_PROJECT_ACCESS,
+                null,
+                values);
     }
 }

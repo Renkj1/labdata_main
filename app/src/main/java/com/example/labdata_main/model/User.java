@@ -17,7 +17,8 @@ public class User {
     private String email;
     // 用户密码
     private String password;
-
+    // 用户类型：0表示普通用户，1表示管理员
+    private int userType;
     // 默认构造函数
     public User() {
     }
@@ -29,6 +30,7 @@ public class User {
      * @param phone 电话号码
      * @param email 邮箱地址
      * @param password 登录密码
+     * @param userType 用户类型（0：普通用户，1：管理员）
      */
     public User(String company, String name, String phone, String email, String password) {
         this.company = company;
@@ -36,6 +38,7 @@ public class User {
         this.phone = phone;
         this.email = email;
         this.password = password;
+        this.userType = 0; // 默认为普通用户
     }
 
     // Getter和Setter方法
@@ -85,5 +88,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+    
+    public int getUserType() {
+        return userType;
+    }
+
+    public void setUserType(int userType) {
+        this.userType = userType;    
     }
 }

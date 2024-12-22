@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 只有管理员可见的下发任务按钮 -->
+    <Button
+        android:id="@+id/btnAssignTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="下发任务"
+        android:textSize="16sp"
+        android:visibility="visible" />
+
+    <!-- 其他现有的实验功能布局 -->
+
+</LinearLayout>

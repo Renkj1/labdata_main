@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.labdata_main.db.DatabaseHelper;  // 添加这行导入语句
 import com.example.labdata_main.utils.SharedPrefsManager;
 
 import java.io.File;
@@ -49,6 +50,7 @@ public class MyFragment extends Fragment {
 
     private SharedPrefsManager sharedPrefsManager;
     private Uri tempImageUri;
+    private DatabaseHelper databaseHelper; // 新增数据库帮助类
 
     private ActivityResultLauncher<Intent> imagePickerLauncher;
     private ActivityResultLauncher<Intent> cropImageLauncher;
@@ -60,6 +62,7 @@ public class MyFragment extends Fragment {
 
         // 初始化 SharedPrefsManager
         sharedPrefsManager = new SharedPrefsManager(requireContext());
+        databaseHelper = new DatabaseHelper(requireContext()); // 初始化数据库帮助类
 
         // 初始化图片选择器
         imagePickerLauncher = registerForActivityResult(
@@ -168,6 +171,9 @@ public class MyFragment extends Fragment {
         String email = sharedPrefsManager.getUserEmail();
         String phone = sharedPrefsManager.getUserPhone();
 
+        // 从数据库获取用户类型
+        int userType = databaseHelper.getUserTypeByEmail(email);
+
         Log.d("MyFragment", "显示用户信息:");
         Log.d("MyFragment", "公司: " + company);
         Log.d("MyFragment", "姓名: " + name);
@@ -178,6 +184,7 @@ public class MyFragment extends Fragment {
         tvEmail.setText(email);
         tvCompany.setText(company);
         tvPhone.setText(phone != null && !phone.isEmpty() ? phone : "未设置");
+        tvPosition.setText(userType == 1 ? "管理员" : "实验员");
     }
 
     /**

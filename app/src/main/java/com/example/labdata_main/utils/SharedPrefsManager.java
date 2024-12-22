@@ -19,6 +19,7 @@ public class SharedPrefsManager {
     private static final String KEY_USER_COMPANY = "userCompany";
     private static final String KEY_USER_PHONE = "userPhone";
     private static final String KEY_USER_AVATAR = "userAvatar";
+    private static final String KEY_USER_TYPE = "userType";
 
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences.Editor editor;
@@ -39,14 +40,16 @@ public class SharedPrefsManager {
      * @param name 用户姓名
      * @param company 用户单位
      * @param phone 用户电话
+     * @param userType 用户类型
      */
-    public void saveUserLoginSession(int id, String email, String name, String company, String phone) {
+    public void saveUserLoginSession(int id, String email, String name, String company, String phone, int userType) {
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.putInt(KEY_USER_ID, id);
         editor.putString(KEY_USER_EMAIL, email);
         editor.putString(KEY_USER_NAME, name);
         editor.putString(KEY_USER_COMPANY, company);
         editor.putString(KEY_USER_PHONE, phone);
+        editor.putInt(KEY_USER_TYPE, userType);
         editor.apply();
     }
 
@@ -148,5 +151,13 @@ public class SharedPrefsManager {
      */
     public String getAvatarUri() {
         return sharedPreferences.getString(KEY_USER_AVATAR, null);
+    }
+
+    /**
+     * 获取用户类型
+     * @return 用户类型，如果未登录返回-1
+     */
+    public int getUserType() {
+        return sharedPreferences.getInt(KEY_USER_TYPE, -1);
     }
 }

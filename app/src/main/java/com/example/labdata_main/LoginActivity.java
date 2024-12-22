@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.RadioGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -26,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etPassword;
     private Button btnLogin;
     private TextView tvRegister;
+    private RadioGroup rgUserType; 
 
     private DatabaseHelper databaseHelper;
     private SharedPrefsManager sharedPrefsManager;
@@ -65,6 +67,7 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         tvRegister = findViewById(R.id.tvRegister);
+        rgUserType = findViewById(R.id.rgUserType);
     }
 
     /**
@@ -169,12 +172,15 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
+        // 获取选择的用户类型
+        int userType = rgUserType.getCheckedRadioButtonId() == R.id.rbAdmin ? 1 : 0;
+        
         // 验证登录
-        User user = databaseHelper.checkUser(email, password);
-        if (user != null) {
-            handleLoginSuccess(user);
+        User user = databaseHelper.getUserByEmailAndType(email, userType);
+    if (user != null && user.getPassword().equals(password)) {
+        handleLoginSuccess(user);
         } else {
-            Toast.makeText(this, "邮箱或密码错误", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "邮箱或密码错误或用户类型错误", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -189,9 +195,9 @@ public class LoginActivity extends AppCompatActivity {
                 user.getEmail(),
                 user.getName(),
                 user.getCompany(),
-                user.getPhone()
+                user.getPhone(),
+                user.getUserType()
             );
-            
             // 检查是否已初始化设备
             if (databaseHelper.hasInitializedEquipment(user.getCompany())) {
                 // 已初始化，直接进入主页

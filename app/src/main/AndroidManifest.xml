@@ -35,35 +35,19 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".MainActivity"
-            android:theme="@style/Theme.Labdata_main"
-            android:exported="false" />
-
-        <activity
-            android:name=".EquipmentInitActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".EquipmentGuideActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".EditInfoActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".QRCodeDisplayActivity"
-            android:exported="false" />
-
+        <activity android:name=".MainActivity" />
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".EquipmentInitActivity" />
+        <activity android:name=".EquipmentGuideActivity" />
+        <activity android:name=".EditInfoActivity" />
+        <activity android:name=".QRCodeDisplayActivity" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity android:name=".AssignTaskActivity" />
+        <activity android:name=".AddDeviceActivity" />
+        <activity android:name=".SelectRatioActivity" />
 
     </application>
 
