@@ -11,4 +11,12 @@
     <color name="gray_text">#9E9E9E</color>
     <color name="blue">#1684FC</color>
     <color name="gray">#DCDCDC</color>
+    <color name="gray_light">#FFCCCCCC</color>
+    <color name="blue_light">#FFE3F2FD</color>
+
+    <!-- 自定义颜色 -->
+    <color name="background_gray">#F5F5F5</color>
+    <color name="text_primary">#333333</color>
+    <color name="text_secondary">#666666</color>
+    <color name="divider">#E0E0E0</color>
 </resources>

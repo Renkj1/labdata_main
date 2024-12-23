@@ -45,11 +45,12 @@
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
-        <activity android:name=".AssignTaskActivity" />
         <activity android:name=".AddDeviceActivity" />
         <activity android:name=".SelectRatioActivity" />
         <activity android:name=".ManufacturingMethodActivity" />
         <activity android:name=".ExperimentDesignActivity" />
+        <activity android:name=".MixRatioEditActivity" />
+        <activity android:name=".MaterialSelectionActivity" />
 
     </application>
 

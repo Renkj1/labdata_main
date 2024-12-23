@@ -204,26 +204,58 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public User checkUser(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
-        // 查询匹配的用户记录
-        Cursor cursor = db.query(TABLE_USERS,
-                new String[]{COLUMN_ID, COLUMN_COMPANY, COLUMN_NAME, COLUMN_PHONE, COLUMN_EMAIL, COLUMN_PASSWORD},
-                COLUMN_EMAIL + "=? AND " + COLUMN_PASSWORD + "=?",
-                new String[]{email, password},
-                null, null, null);
-
         User user = null;
-        if (cursor != null && cursor.moveToFirst()) {
-            // 找到匹配的用户，创建用户对象
-            user = new User();
-            user.setId(cursor.getInt(0));
-            user.setCompany(cursor.getString(1));
-            user.setName(cursor.getString(2));
-            user.setPhone(cursor.getString(3));
-            user.setEmail(cursor.getString(4));
-            user.setPassword(cursor.getString(5));
-            cursor.close();
+
+        try {
+            String[] columns = {
+                COLUMN_ID,
+                COLUMN_COMPANY,
+                COLUMN_NAME,
+                COLUMN_PHONE,
+                COLUMN_EMAIL,
+                COLUMN_PASSWORD,
+                COLUMN_USER_TYPE
+            };
+
+            String selection = COLUMN_EMAIL + " = ?";
+            String[] selectionArgs = {email};
+
+            android.util.Log.d(TAG, "Checking user with email: " + email);
+
+            Cursor cursor = db.query(TABLE_USERS,
+                    columns,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                String storedPassword = cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD));
+                if (password.equals(storedPassword)) {
+                    String company = cursor.getString(cursor.getColumnIndex(COLUMN_COMPANY));
+                    String name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME));
+                    String phone = cursor.getString(cursor.getColumnIndex(COLUMN_PHONE));
+                    int userType = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_TYPE));
+                    
+                    android.util.Log.d(TAG, "User found. User type from database: " + userType);
+                    
+                    user = new User(company, name, phone, email, password, userType);
+                    user.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_ID)));
+                    
+                    android.util.Log.d(TAG, "User object created. Verifying user type: " + user.getUserType());
+                }
+                cursor.close();
+            } else {
+                android.util.Log.d(TAG, "No user found with email: " + email);
+            }
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Error checking user: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            db.close();
         }
-        db.close();
+
         return user;
     }
 

@@ -158,6 +158,8 @@ public class SharedPrefsManager {
      * @return 用户类型，如果未登录返回-1
      */
     public int getUserType() {
-        return sharedPreferences.getInt(KEY_USER_TYPE, -1);
+        int userType = sharedPreferences.getInt(KEY_USER_TYPE, -1);
+        android.util.Log.d("SharedPrefsManager", "Getting user type: " + userType);
+        return userType;
     }
 }

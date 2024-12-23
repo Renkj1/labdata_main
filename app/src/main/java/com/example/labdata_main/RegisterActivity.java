@@ -249,13 +249,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         // 创建用户对象
-        User user = new User();
-        user.setCompany(company);
-        user.setName(name);
-        user.setPhone(phone);
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setUserType(userType);  // 设置用户类型
+        User user = new User(company, name, phone, email, password, userType);
 
         // 保存用户信息到数据库
         long id = databaseHelper.addUser(user);
@@ -267,7 +261,7 @@ public class RegisterActivity extends AppCompatActivity {
                 name,
                 company,
                 phone,
-                userType  // 添加用户类型
+                userType
             );
             Toast.makeText(this, "注册成功", Toast.LENGTH_SHORT).show();
             finish();

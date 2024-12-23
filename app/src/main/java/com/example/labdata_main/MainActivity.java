@@ -28,16 +28,6 @@ public class MainActivity extends AppCompatActivity {
         ViewPagerAdapter adapter = new ViewPagerAdapter(this);
         viewPager.setAdapter(adapter);
 
-        // 动态调整 ViewPager 的 marginTop，使其紧跟 TabLayout 下面
-        tabLayout.post(() -> {
-            int tabLayoutHeight = tabLayout.getHeight(); // 获取 TabLayout 的高度（像素值）
-
-            // 修改 ViewPager2 的 marginTop
-            ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
-            layoutParams.topMargin = tabLayoutHeight; // 设置 marginTop 为 TabLayout 的高度
-            viewPager.setLayoutParams(layoutParams);  // 应用新的布局参数
-        });
-
         // 使用 TabLayoutMediator 来连接 TabLayout 和 ViewPager
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             // 为每个 Tab 设置名称

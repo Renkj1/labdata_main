@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#F5F5F5" />
+            <corners android:radius="8dp" />
+            <stroke
+                android:width="1dp"
+                android:color="#E0E0E0" />
+        </shape>
+    </item>
+    <item android:gravity="end|center_vertical" android:right="8dp">
+        <layer-list>
+            <item android:width="24dp" android:height="24dp">
+                <rotate
+                    android:fromDegrees="0"
+                    android:toDegrees="0">
+                    <!-- Using the vector drawable directly -->
+                    <vector
+                        android:width="24dp"
+                        android:height="24dp"
+                        android:viewportWidth="24"
+                        android:viewportHeight="24"
+                        android:tint="#757575">
+                        <path
+                            android:fillColor="#757575"
+                            android:pathData="M7,10l5,5 5,-5z"/>
+                    </vector>
+                </rotate>
+            </item>
+        </layer-list>
+    </item>
+</layer-list>

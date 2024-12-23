@@ -1,31 +1,186 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="#F5F5F5">
 
-    <Spinner
-        android:id="@+id/experiment_spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="8dp"/>
-
-    <FrameLayout
-        android:id="@+id/fragment_container"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="wrap_content"
+        android:background="@color/purple_500"
+        android:elevation="4dp">
 
-        <TextView
-            android:id="@+id/mix_text"
+        <!-- 欢迎语区域 -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:text="这是沥青混合料的概览界面"/>
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="32dp"
+            android:paddingBottom="24dp">
 
-    </FrameLayout>
+            <TextView
+                android:id="@+id/welcome_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"/>
 
-</LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="欢迎使用实验室数据管理系统"
+                android:textColor="#E0E0E0"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"/>
+
+        </LinearLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- 实验类型选择卡片 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="选择实验类型"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp"/>
+
+                    <Spinner
+                        android:id="@+id/experiment_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/spinner_background"
+                        android:spinnerMode="dropdown"
+                        android:popupBackground="@android:color/white"
+                        android:overlapAnchor="false"/>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- 按钮区域 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:gravity="center"
+                    android:weightSum="2">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/assign_task_button"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="0.95"
+                        android:layout_marginEnd="8dp"
+                        android:text="制定实验任务"
+                        android:textSize="15sp"
+                        app:cornerRadius="8dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        style="@style/Widget.MaterialComponents.Button"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/add_mix_button"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="0.95"
+                        android:layout_marginStart="8dp"
+                        android:text="添加配合比"
+                        android:textSize="15sp"
+                        app:cornerRadius="8dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        style="@style/Widget.MaterialComponents.Button"/>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+
+            <!-- 实验概览卡片 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="实验概览"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp"/>
+
+                    <FrameLayout
+                        android:id="@+id/fragment_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/mix_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary"
+                            android:lineSpacingExtra="4dp"
+                            android:text="这是沥青混合料的概览界面"/>
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
