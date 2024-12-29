@@ -3,12 +3,12 @@ package com.example.labdata_main;
 public class MaterialItem {
     private String name;
     private float percentage;
-    private boolean isSelected;
+    private String type;
 
-    public MaterialItem(String name, float percentage) {
+    public MaterialItem(String name, float percentage, String type) {
         this.name = name;
         this.percentage = percentage;
-        this.isSelected = false;
+        this.type = type;
     }
 
     public String getName() {
@@ -27,11 +27,11 @@ public class MaterialItem {
         this.percentage = percentage;
     }
 
-    public boolean isSelected() {
-        return isSelected;
+    public String getType() {
+        return type;
     }
 
-    public void setSelected(boolean selected) {
-        isSelected = selected;
+    public void setType(String type) {
+        this.type = type;
     }
 }

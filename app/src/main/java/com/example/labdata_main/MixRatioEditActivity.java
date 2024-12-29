@@ -16,6 +16,7 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,8 +108,86 @@ public class MixRatioEditActivity extends AppCompatActivity {
 
     private void setupListeners() {
         findViewById(R.id.next_step_button).setOnClickListener(v -> {
-            // TODO: 处理下一步逻辑
+            if (validateMaterials()) {
+                saveMixRatio();
+            }
         });
+
+        // 点击添加按钮添加新原料
+        FloatingActionButton addButton = findViewById(R.id.add_material_button);
+        addButton.setOnClickListener(v -> {
+            // 计算剩余可用百分比
+            float usedPercentage = 0;
+            for (MaterialItem material : materials) {
+                usedPercentage += material.getPercentage();
+            }
+            float availablePercentage = 100 - usedPercentage;
+
+            if (availablePercentage > 0) {
+                Intent intent = new Intent(this, MaterialSelectionActivity.class);
+                intent.putExtra("maxPercentage", availablePercentage);
+                startActivityForResult(intent, REQUEST_ADD_MATERIAL);
+            } else {
+                android.widget.Toast.makeText(this, "配比总和已达到100%，无法添加新原料", android.widget.Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private boolean validateMaterials() {
+        if (materials.isEmpty()) {
+            showToast("请添加至少一种原料");
+            return false;
+        }
+
+        // 检查是否有沥青、沙子和石子
+        boolean hasAsphalt = false;
+        boolean hasSand = false;
+        boolean hasStone = false;
+        
+        // 检查总百分比
+        float totalPercentage = 0f;
+
+        for (MaterialItem material : materials) {
+            String type = material.getType();
+            if ("asphalt".equals(type)) {
+                hasAsphalt = true;
+            } else if ("sand".equals(type)) {
+                hasSand = true;
+            } else if ("stone".equals(type)) {
+                hasStone = true;
+            }
+            totalPercentage += material.getPercentage();
+        }
+
+        // 检查必需的原料类型
+        StringBuilder missingMaterials = new StringBuilder();
+        if (!hasAsphalt) {
+            missingMaterials.append("沥青、");
+        }
+        if (!hasSand) {
+            missingMaterials.append("沙子、");
+        }
+        if (!hasStone) {
+            missingMaterials.append("石子、");
+        }
+
+        if (missingMaterials.length() > 0) {
+            missingMaterials.setLength(missingMaterials.length() - 1); // 移除最后的顿号
+            showToast("缺少必需的原料：" + missingMaterials.toString());
+            return false;
+        }
+
+        // 检查总百分比是否为100%
+        if (Math.abs(totalPercentage - 100) > 0.01f) {
+            showToast("原料配比总和必须为100%，当前为" + String.format("%.1f%%", totalPercentage));
+            return false;
+        }
+
+        return true;
+    }
+
+    private void showToast(String message) {
+        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -116,16 +195,25 @@ public class MixRatioEditActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_ADD_MATERIAL && resultCode == RESULT_OK && data != null) {
             // 获取选择的原料信息
-            int materialType = data.getIntExtra("material_type", 0);
-            String materialName = data.getStringExtra("material_name");
-            String materialBatch = data.getStringExtra("material_batch");
+            String materialType = data.getStringExtra("materialType");
+            String materialName = data.getStringExtra("materialName");
+            String materialCode = data.getStringExtra("materialCode");
             String gradation = data.getStringExtra("gradation");
             float percentage = data.getFloatExtra("percentage", 0f);
 
+            // 创建原料显示名称
+            String displayName;
+            if (materialType.equals("sand")) {
+                displayName = String.format("%s\n编号：%s\n级配：%s", 
+                    materialName, materialCode, gradation);
+            } else {
+                String typeDisplay = materialType.equals("asphalt") ? "沥青" : "石子";
+                displayName = String.format("%s·%s\n编号：%s\n级配：%s", 
+                    typeDisplay, materialName, materialCode, gradation);
+            }
+
             // 创建新的原料项
-            String displayName = String.format("%s\n%s\n级配：%s", 
-                materialName, materialBatch, gradation);
-            MaterialItem newMaterial = new MaterialItem(displayName, percentage);
+            MaterialItem newMaterial = new MaterialItem(displayName, percentage, materialType);
             materials.add(newMaterial);
             adapter.notifyItemInserted(materials.size() - 1);
             updatePieChart();
@@ -182,5 +270,42 @@ public class MixRatioEditActivity extends AppCompatActivity {
             Color.rgb(96, 125, 139),    // 蓝灰色
             Color.rgb(158, 158, 158)    // 用于未分配部分的灰色
         };
+    }
+
+    private void saveMixRatio() {
+        // 创建新的配比对象
+        MixRatio mixRatio = new MixRatio();
+        mixRatio.setName(((TextView) findViewById(R.id.mix_ratio_name)).getText().toString());
+        mixRatio.setCreatedTime(System.currentTimeMillis());
+        
+        // 将材料列表转换为JSON字符串
+        Gson gson = new Gson();
+        String materialsJson = gson.toJson(materials);
+        mixRatio.setMaterials(materialsJson);
+
+        // 在后台线程中保存数据
+        new Thread(() -> {
+            // 获取数据库实例
+            AppDatabase db = AppDatabase.getInstance(this);
+            // 插入新的配比记录
+            long id = db.mixRatioDao().insert(mixRatio);
+            
+            // 在主线程中处理保存后的操作
+            runOnUiThread(() -> {
+                if (id > 0) {
+                    // 保存成功
+                    android.widget.Toast.makeText(this, "配比保存成功", android.widget.Toast.LENGTH_SHORT).show();
+                    
+                    // 返回主页面
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    // 保存失败
+                    android.widget.Toast.makeText(this, "保存失败，请重试", android.widget.Toast.LENGTH_SHORT).show();
+                }
+            });
+        }).start();
     }
 }
