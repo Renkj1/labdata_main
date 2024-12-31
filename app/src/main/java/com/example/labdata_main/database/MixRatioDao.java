@@ -1,11 +1,11 @@
-package com.example.labdata_main;
+package com.example.labdata_main.database;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
-
+import com.example.labdata_main.model.MixRatio;
 import java.util.List;
 
 @Dao
@@ -19,7 +19,7 @@ public interface MixRatioDao {
     @Delete
     void delete(MixRatio mixRatio);
 
-    @Query("SELECT * FROM mix_ratios ORDER BY createdTime DESC")
+    @Query("SELECT * FROM mix_ratios ORDER BY creationTime DESC")
     List<MixRatio> getAllMixRatios();
 
     @Query("SELECT * FROM mix_ratios WHERE id = :id")

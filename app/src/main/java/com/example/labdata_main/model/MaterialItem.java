@@ -1,4 +1,4 @@
-package com.example.labdata_main;
+package com.example.labdata_main.model;
 
 import java.io.Serializable;
 

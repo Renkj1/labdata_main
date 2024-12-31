@@ -9,11 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -47,9 +43,6 @@ public class OverviewFragment extends Fragment {
             MixRatioBottomSheetFragment bottomSheet = MixRatioBottomSheetFragment.newInstance();
             bottomSheet.show(getChildFragmentManager(), "MixRatioBottomSheet");
         });
-
-        // 设置任务按钮点击事件
-        view.findViewById(R.id.assign_task_button).setOnClickListener(v -> showTaskOptionsDialog());
 
         // 设置欢迎语
         updateWelcomeMessage();
@@ -95,6 +88,12 @@ public class OverviewFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
                 // Do nothing
             }
+        });
+
+        // 设置制订实验任务按钮点击事件
+        view.findViewById(R.id.assign_task_button).setOnClickListener(v -> {
+            ExperimentTaskBottomSheet.newInstance()
+                .show(getParentFragmentManager(), "ExperimentTaskBottomSheet");
         });
 
         return view;
@@ -143,42 +142,6 @@ public class OverviewFragment extends Fragment {
         String welcomeMessage = String.format("%s，%s%s", greeting, userTypeStr, userName);
         welcomeText.setText(welcomeMessage);
         Log.d("OverviewFragment", "Final welcome message: " + welcomeMessage);
-    }
-
-    private void showTaskOptionsDialog() {
-        // 创建对话框构建器
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        
-        // 加载自定义布局
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_task_options, null);
-        builder.setView(dialogView);
-
-        // 创建对话框
-        AlertDialog dialog = builder.create();
-        
-        // 设置圆角背景
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_rounded_background);
-        }
-
-        // 设置按钮点击事件
-        MaterialButton btnAddProject = dialogView.findViewById(R.id.btn_add_project);
-        MaterialButton btnAddTask = dialogView.findViewById(R.id.btn_add_task);
-
-        btnAddProject.setOnClickListener(v -> {
-            // TODO: 处理添加项目的逻辑
-            Toast.makeText(requireContext(), "添加项目", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
-        });
-
-        btnAddTask.setOnClickListener(v -> {
-            // TODO: 处理添加项目任务的逻辑
-            Toast.makeText(requireContext(), "添加项目任务", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
-        });
-
-        // 显示对话框
-        dialog.show();
     }
 
     @Override

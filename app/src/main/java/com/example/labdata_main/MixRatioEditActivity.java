@@ -3,25 +3,27 @@ package com.example.labdata_main;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.example.labdata_main.database.AppDatabase;
+import com.example.labdata_main.model.MaterialItem;
+import com.example.labdata_main.model.MixRatio;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class MixRatioEditActivity extends AppCompatActivity {
+    private static final String TAG = "MixRatioEditActivity";
     private PieChart pieChart;
     private RecyclerView materialsList;
     private MaterialAdapter adapter;
@@ -39,10 +41,13 @@ public class MixRatioEditActivity extends AppCompatActivity {
         materials = new ArrayList<>();
         mixRatioName = getIntent().getStringExtra("mix_ratio_name");
         
-        // 初始化视图和设置
+        // 初始化视图
         initViews();
-        setupMaterialsList();
+        // 设置RecyclerView
+        setupRecyclerView();
+        // 设置饼图
         setupPieChart();
+        // 设置监听器
         setupListeners();
     }
 
@@ -50,27 +55,42 @@ public class MixRatioEditActivity extends AppCompatActivity {
         TextView titleText = findViewById(R.id.mix_ratio_name);
         titleText.setText(mixRatioName);
 
+        // 初始化返回按钮
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> finish());
 
-        pieChart = findViewById(R.id.pie_chart);
-        materialsList = findViewById(R.id.materials_list);
-
-        FloatingActionButton addButton = findViewById(R.id.add_material_button);
-        addButton.setOnClickListener(v -> {
-            // 计算剩余可用百分比
-            float usedPercentage = 0;
-            for (MaterialItem material : materials) {
-                usedPercentage += material.getPercentage();
+        // 初始化下一步按钮
+        findViewById(R.id.next_step_button).setOnClickListener(v -> {
+            if (validateMaterials()) {
+                saveMixRatio();
             }
-            float availablePercentage = 100 - usedPercentage;
+        });
+
+        // 初始化添加材料按钮
+        FloatingActionButton addMaterialButton = findViewById(R.id.add_material_button);
+        addMaterialButton.setOnClickListener(v -> {
+            float availablePercentage = 100f;
+            for (MaterialItem item : materials) {
+                availablePercentage -= item.getPercentage();
+            }
 
             if (availablePercentage > 0) {
                 Intent intent = new Intent(this, MaterialSelectionActivity.class);
-                intent.putExtra("available_percentage", availablePercentage);
+                intent.putExtra("maxPercentage", availablePercentage);
                 startActivityForResult(intent, REQUEST_ADD_MATERIAL);
+            } else {
+                showToast("配比总和已达到100%，无法添加新原料");
             }
         });
+
+        pieChart = findViewById(R.id.pie_chart);
+        materialsList = findViewById(R.id.materials_list);
+    }
+
+    private void setupRecyclerView() {
+        adapter = new MaterialAdapter(materials, this::updatePieChart);
+        materialsList.setLayoutManager(new LinearLayoutManager(this));
+        materialsList.setAdapter(adapter);
     }
 
     private void setupPieChart() {
@@ -100,19 +120,7 @@ public class MixRatioEditActivity extends AppCompatActivity {
         pieChart.animateY(1400);
     }
 
-    private void setupMaterialsList() {
-        adapter = new MaterialAdapter(materials, this::updatePieChart);
-        materialsList.setLayoutManager(new LinearLayoutManager(this));
-        materialsList.setAdapter(adapter);
-    }
-
     private void setupListeners() {
-        findViewById(R.id.next_step_button).setOnClickListener(v -> {
-            if (validateMaterials()) {
-                saveMixRatio();
-            }
-        });
-
         // 点击添加按钮添加新原料
         FloatingActionButton addButton = findViewById(R.id.add_material_button);
         addButton.setOnClickListener(v -> {
@@ -128,7 +136,7 @@ public class MixRatioEditActivity extends AppCompatActivity {
                 intent.putExtra("maxPercentage", availablePercentage);
                 startActivityForResult(intent, REQUEST_ADD_MATERIAL);
             } else {
-                android.widget.Toast.makeText(this, "配比总和已达到100%，无法添加新原料", android.widget.Toast.LENGTH_SHORT).show();
+                showToast("配比总和已达到100%，无法添加新原料");
             }
         });
     }
@@ -187,7 +195,7 @@ public class MixRatioEditActivity extends AppCompatActivity {
     }
 
     private void showToast(String message) {
-        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -273,39 +281,57 @@ public class MixRatioEditActivity extends AppCompatActivity {
     }
 
     private void saveMixRatio() {
-        // 创建新的配比对象
-        MixRatio mixRatio = new MixRatio();
-        mixRatio.setName(((TextView) findViewById(R.id.mix_ratio_name)).getText().toString());
-        mixRatio.setCreatedTime(System.currentTimeMillis());
-        
-        // 将材料列表转换为JSON字符串
-        Gson gson = new Gson();
-        String materialsJson = gson.toJson(materials);
-        mixRatio.setMaterials(materialsJson);
+        Log.d(TAG, "开始保存配比数据");
+        Log.d(TAG, "配比名称: " + mixRatioName);
+        Log.d(TAG, "材料数量: " + materials.size());
 
-        // 在后台线程中保存数据
+        // 从 mixRatioName 字段获取配比名称
+        if (mixRatioName == null || mixRatioName.isEmpty()) {
+            showToast("请输入配比名称");
+            return;
+        }
+
+        // 检查材料列表
+        if (materials.isEmpty()) {
+            showToast("请添加至少一种原料");
+            return;
+        }
+
+        // 创建配比对象
+        MixRatio mixRatio = new MixRatio();
+        mixRatio.setName(mixRatioName);
+        mixRatio.setCreationTime(System.currentTimeMillis());
+        
+        // 转换材料列表
+        List<MaterialItem> materialsList = new ArrayList<>(materials);
+        mixRatio.setMaterials(materialsList);
+
+        // 打印每个材料的信息
+        for (MaterialItem item : materialsList) {
+            Log.d(TAG, String.format("材料: %s, 百分比: %.2f%%, 类型: %s",
+                item.getName(), item.getPercentage(), item.getType()));
+        }
+
+        // 保存到数据库
+        AppDatabase db = AppDatabase.getInstance(this);
         new Thread(() -> {
-            // 获取数据库实例
-            AppDatabase db = AppDatabase.getInstance(this);
-            // 插入新的配比记录
-            long id = db.mixRatioDao().insert(mixRatio);
-            
-            // 在主线程中处理保存后的操作
-            runOnUiThread(() -> {
-                if (id > 0) {
-                    // 保存成功
-                    android.widget.Toast.makeText(this, "配比保存成功", android.widget.Toast.LENGTH_SHORT).show();
-                    
-                    // 返回主页面
-                    Intent intent = new Intent(this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    startActivity(intent);
+            try {
+                Log.d(TAG, "正在执行数据库插入操作");
+                long id = db.mixRatioDao().insert(mixRatio);
+                Log.d(TAG, "配比保存成功，ID：" + id);
+                
+                // 在主线程显示成功提示并返回
+                runOnUiThread(() -> {
+                    showToast("配比保存成功");
+                    setResult(RESULT_OK);
                     finish();
-                } else {
-                    // 保存失败
-                    android.widget.Toast.makeText(this, "保存失败，请重试", android.widget.Toast.LENGTH_SHORT).show();
-                }
-            });
+                });
+            } catch (Exception e) {
+                Log.e(TAG, "保存失败", e);
+                runOnUiThread(() -> {
+                    showToast("保存失败: " + e.getMessage());
+                });
+            }
         }).start();
     }
 }

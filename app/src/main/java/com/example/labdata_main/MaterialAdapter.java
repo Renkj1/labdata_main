@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.labdata_main.model.MaterialItem;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.List;

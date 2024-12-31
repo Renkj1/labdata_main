@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "a562b78839df0585afe20b4e99ff0d18",
+    "version": 2,
+    "identityHash": "bd4850910743a169e95f01095197040b",
     "entities": [
       {
         "tableName": "mix_ratios",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `creationTime` INTEGER NOT NULL, `materials` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `creation_time` INTEGER NOT NULL, `materials` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -22,7 +22,7 @@
           },
           {
             "fieldPath": "creationTime",
-            "columnName": "creationTime",
+            "columnName": "creation_time",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -46,7 +46,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a562b78839df0585afe20b4e99ff0d18')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bd4850910743a169e95f01095197040b')"
     ]
   }
 }
