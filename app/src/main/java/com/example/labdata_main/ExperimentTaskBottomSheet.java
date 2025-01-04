@@ -5,36 +5,34 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class ExperimentTaskBottomSheet extends BottomSheetDialogFragment {
+    private TextInputEditText etTaskName;
+    private MaterialButton btnNext;
 
     public static ExperimentTaskBottomSheet newInstance() {
         return new ExperimentTaskBottomSheet();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.bottom_sheet_experiment_task, container, false);
 
-        MaterialCardView addProjectCard = view.findViewById(R.id.add_project_card);
-        MaterialCardView addTaskCard = view.findViewById(R.id.add_task_card);
+        etTaskName = view.findViewById(R.id.etTaskName);
+        btnNext = view.findViewById(R.id.btnNext);
 
-        addProjectCard.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), AddProjectActivity.class);
-            startActivity(intent);
-            dismiss();
-        });
-
-        addTaskCard.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), SelectProjectActivity.class);
-            startActivity(intent);
+        btnNext.setOnClickListener(v -> {
+            String taskName = etTaskName.getText().toString().trim();
+            if (taskName.isEmpty()) {
+                Toast.makeText(requireContext(), "请输入任务名称", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            ExperimentTaskSetupActivity.start(requireContext(), taskName);
             dismiss();
         });
 

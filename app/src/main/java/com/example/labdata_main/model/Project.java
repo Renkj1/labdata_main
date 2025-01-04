@@ -1,36 +1,68 @@
 package com.example.labdata_main.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+import androidx.room.ColumnInfo;
+import androidx.room.Ignore;
+
+@Entity(tableName = "projects")
 public class Project {
+    @PrimaryKey(autoGenerate = true)
     private int id;
+
+    @ColumnInfo(name = "name")
     private String name;
-    private boolean isAccessible;
+
+    @ColumnInfo(name = "deadline")
     private String deadline;
+
+    @ColumnInfo(name = "create_time")
     private long createTime;
+
+    @ColumnInfo(name = "is_accessible")
+    private boolean isAccessible;
+
+    @ColumnInfo(name = "has_access")
     private boolean hasAccess;
 
+    public Project() {
+        this.createTime = System.currentTimeMillis();
+        this.isAccessible = true;
+        this.hasAccess = true;
+    }
+
+    @Ignore
     public Project(int id, String name, boolean isAccessible) {
+        this();
         this.id = id;
         this.name = name;
         this.isAccessible = isAccessible;
     }
 
+    @Ignore
     public Project(String name, String deadline) {
+        this();
         this.name = name;
         this.deadline = deadline;
-        this.isAccessible = true;
-        this.createTime = System.currentTimeMillis();
     }
 
+    @Ignore
     public Project(int id, String name, String deadline, long createTime, boolean isAccessible) {
         this.id = id;
         this.name = name;
         this.deadline = deadline;
         this.createTime = createTime;
         this.isAccessible = isAccessible;
+        this.hasAccess = true;
     }
 
+    @Ignore
     public Project(int id, String name, String deadline, long createTime, boolean isAccessible, boolean hasAccess) {
-        this(id, name, deadline, createTime, isAccessible);
+        this.id = id;
+        this.name = name;
+        this.deadline = deadline;
+        this.createTime = createTime;
+        this.isAccessible = isAccessible;
         this.hasAccess = hasAccess;
     }
 
@@ -50,14 +82,6 @@ public class Project {
         this.name = name;
     }
 
-    public boolean isAccessible() {
-        return isAccessible;
-    }
-
-    public void setAccessible(boolean accessible) {
-        isAccessible = accessible;
-    }
-
     public String getDeadline() {
         return deadline;
     }
@@ -72,6 +96,14 @@ public class Project {
 
     public void setCreateTime(long createTime) {
         this.createTime = createTime;
+    }
+
+    public boolean isAccessible() {
+        return isAccessible;
+    }
+
+    public void setAccessible(boolean accessible) {
+        isAccessible = accessible;
     }
 
     public boolean hasAccess() {

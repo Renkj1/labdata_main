@@ -14,7 +14,7 @@ import com.example.labdata_main.dao.SpecimenDao;
 import com.example.labdata_main.model.MixRatio;
 import com.example.labdata_main.model.Specimen;
 
-@Database(entities = {MixRatio.class, Specimen.class}, version = 4)
+@Database(entities = {MixRatio.class, Specimen.class}, version = 5)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
     private static final String TAG = "AppDatabase";
@@ -86,6 +86,31 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            Log.d(TAG, "Running migration from version 4 to version 5");
+            
+            // 备份旧表
+            database.execSQL("ALTER TABLE mix_ratios RENAME TO mix_ratios_old");
+            
+            // 创建新表
+            database.execSQL("CREATE TABLE mix_ratios (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "name TEXT NOT NULL, " +
+                    "description TEXT, " +
+                    "creation_time INTEGER NOT NULL, " +
+                    "materials TEXT NOT NULL)");
+            
+            // 复制数据
+            database.execSQL("INSERT INTO mix_ratios (id, name, description, creation_time, materials) " +
+                    "SELECT id, name, description, creation_time, materials FROM mix_ratios_old");
+            
+            // 删除旧表
+            database.execSQL("DROP TABLE mix_ratios_old");
+        }
+    };
+
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {
             Log.d(TAG, "Creating new database instance");
@@ -93,7 +118,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     context.getApplicationContext(),
                     AppDatabase.class,
                     DATABASE_NAME)
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                     .build();
             Log.d(TAG, "Database instance created");
         }

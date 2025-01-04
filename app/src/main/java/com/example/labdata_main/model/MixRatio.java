@@ -17,8 +17,14 @@ public class MixRatio {
     @ColumnInfo(name = "name")
     private String name;
 
+    @ColumnInfo(name = "description")
+    private String description;
+
     @ColumnInfo(name = "creation_time")
     private long creationTime;
+    
+    @ColumnInfo(name = "project_id")
+    private long projectId;
     
     @TypeConverters(Converters.class)
     @ColumnInfo(name = "materials")
@@ -44,12 +50,28 @@ public class MixRatio {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public long getCreationTime() {
         return creationTime;
     }
 
     public void setCreationTime(long creationTime) {
         this.creationTime = creationTime;
+    }
+
+    public long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(long projectId) {
+        this.projectId = projectId;
     }
 
     public List<MaterialItem> getMaterials() {

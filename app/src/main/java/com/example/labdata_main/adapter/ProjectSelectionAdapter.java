@@ -6,25 +6,19 @@ import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.labdata_main.R;
 import com.example.labdata_main.model.Project;
-import java.util.ArrayList;
-import java.util.List;
 
-public class ProjectSelectionAdapter extends RecyclerView.Adapter<ProjectSelectionAdapter.ProjectViewHolder> {
-    private List<Project> projects;
+public class ProjectSelectionAdapter extends ListAdapter<Project, ProjectSelectionAdapter.ProjectViewHolder> {
     private int selectedPosition = -1;
     private final OnProjectSelectedListener listener;
 
     public ProjectSelectionAdapter(OnProjectSelectedListener listener) {
-        this.projects = new ArrayList<>();
+        super(new ProjectDiffCallback());
         this.listener = listener;
-    }
-
-    public void setProjects(List<Project> projects) {
-        this.projects = projects;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -37,7 +31,7 @@ public class ProjectSelectionAdapter extends RecyclerView.Adapter<ProjectSelecti
 
     @Override
     public void onBindViewHolder(@NonNull ProjectViewHolder holder, int position) {
-        Project project = projects.get(position);
+        Project project = getItem(position);
         holder.tvProjectName.setText(project.getName());
         holder.tvDeadline.setText("截止日期：" + project.getDeadline());
         
@@ -52,11 +46,6 @@ public class ProjectSelectionAdapter extends RecyclerView.Adapter<ProjectSelecti
             notifyItemChanged(selectedPosition);
             listener.onProjectSelected(project);
         });
-    }
-
-    @Override
-    public int getItemCount() {
-        return projects.size();
     }
 
     static class ProjectViewHolder extends RecyclerView.ViewHolder {
@@ -74,5 +63,18 @@ public class ProjectSelectionAdapter extends RecyclerView.Adapter<ProjectSelecti
 
     public interface OnProjectSelectedListener {
         void onProjectSelected(Project project);
+    }
+
+    private static class ProjectDiffCallback extends DiffUtil.ItemCallback<Project> {
+        @Override
+        public boolean areItemsTheSame(@NonNull Project oldItem, @NonNull Project newItem) {
+            return oldItem.getId() == newItem.getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull Project oldItem, @NonNull Project newItem) {
+            return oldItem.getName().equals(newItem.getName()) 
+                && oldItem.getDeadline().equals(newItem.getDeadline());
+        }
     }
 }
