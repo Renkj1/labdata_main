@@ -9,12 +9,17 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
+import com.example.labdata_main.dao.MaterialDao;
 import com.example.labdata_main.dao.MixRatioDao;
+import com.example.labdata_main.dao.MoldingMethodDao;
 import com.example.labdata_main.dao.SpecimenDao;
+import com.example.labdata_main.model.Material;
+import com.example.labdata_main.model.MixDesign;
 import com.example.labdata_main.model.MixRatio;
+import com.example.labdata_main.model.MoldingMethod;
 import com.example.labdata_main.model.Specimen;
 
-@Database(entities = {MixRatio.class, Specimen.class}, version = 5)
+@Database(entities = {MixRatio.class, Specimen.class, Material.class, MixDesign.class, MoldingMethod.class}, version = 6)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
     private static final String TAG = "AppDatabase";
@@ -23,6 +28,8 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract MixRatioDao mixRatioDao();
     public abstract SpecimenDao specimenDao();
+    public abstract MaterialDao materialDao();
+    public abstract MoldingMethodDao moldingMethodDao();
 
     static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
@@ -35,11 +42,7 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             Log.d(TAG, "Running migration from version 2 to version 3");
-            
-            // 删除旧表（如果存在）
             database.execSQL("DROP TABLE IF EXISTS specimens");
-            
-            // 创建新表
             database.execSQL("CREATE TABLE IF NOT EXISTS specimens (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                     "mix_ratio_id INTEGER NOT NULL, " +
@@ -61,11 +64,7 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             Log.d(TAG, "Running migration from version 3 to version 4");
-            
-            // 删除旧表
             database.execSQL("DROP TABLE IF EXISTS specimens");
-            
-            // 重新创建表，包含新的索引
             database.execSQL("CREATE TABLE specimens (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                     "mix_ratio_id INTEGER NOT NULL, " +
@@ -80,8 +79,6 @@ public abstract class AppDatabase extends RoomDatabase {
                     "height REAL NOT NULL DEFAULT 0, " +
                     "radius REAL NOT NULL DEFAULT 0, " +
                     "FOREIGN KEY(mix_ratio_id) REFERENCES mix_ratios(id) ON DELETE CASCADE)");
-
-            // 创建索引
             database.execSQL("CREATE INDEX index_specimens_mix_ratio_id ON specimens(mix_ratio_id)");
         }
     };
@@ -90,24 +87,44 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             Log.d(TAG, "Running migration from version 4 to version 5");
-            
-            // 备份旧表
             database.execSQL("ALTER TABLE mix_ratios RENAME TO mix_ratios_old");
-            
-            // 创建新表
             database.execSQL("CREATE TABLE mix_ratios (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                     "name TEXT NOT NULL, " +
                     "description TEXT, " +
                     "creation_time INTEGER NOT NULL, " +
                     "materials TEXT NOT NULL)");
-            
-            // 复制数据
             database.execSQL("INSERT INTO mix_ratios (id, name, description, creation_time, materials) " +
                     "SELECT id, name, description, creation_time, materials FROM mix_ratios_old");
-            
-            // 删除旧表
             database.execSQL("DROP TABLE mix_ratios_old");
+        }
+    };
+
+    static final Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            Log.d(TAG, "Running migration from version 5 to version 6");
+            // 创建材料属性表
+            database.execSQL("CREATE TABLE IF NOT EXISTS material_properties (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "type TEXT NOT NULL, " +
+                    "name TEXT NOT NULL, " +
+                    "unit TEXT)");
+
+            // 创建配合比设计表
+            database.execSQL("CREATE TABLE IF NOT EXISTS mix_designs (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "designGroup INTEGER NOT NULL, " +
+                    "materialType TEXT NOT NULL, " +
+                    "materialName TEXT NOT NULL, " +
+                    "proportion REAL NOT NULL)");
+
+            // 创建材料表
+            database.execSQL("CREATE TABLE IF NOT EXISTS materials (" +
+                    "id TEXT PRIMARY KEY NOT NULL, " +
+                    "name TEXT NOT NULL, " +
+                    "description TEXT, " +
+                    "category TEXT)");
         }
     };
 
@@ -118,7 +135,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     context.getApplicationContext(),
                     AppDatabase.class,
                     DATABASE_NAME)
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                     .build();
             Log.d(TAG, "Database instance created");
         }

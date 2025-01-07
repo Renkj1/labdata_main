@@ -1,24 +1,35 @@
 package com.example.labdata_main;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.labdata_main.database.AppDatabase;
+import android.util.Log;
+
+import com.example.labdata_main.database.DatabaseHelper;
 import com.example.labdata_main.model.MaterialItem;
 import com.example.labdata_main.model.MixRatio;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +40,7 @@ public class MixRatioEditActivity extends AppCompatActivity {
     private MaterialAdapter adapter;
     private List<MaterialItem> materials;
     private String mixRatioName;
+    private TextView mixRatioNameTextView;
 
     private static final int REQUEST_ADD_MATERIAL = 1001;
 
@@ -49,11 +61,12 @@ public class MixRatioEditActivity extends AppCompatActivity {
         setupPieChart();
         // 设置监听器
         setupListeners();
+        setupNameEditListener();
     }
 
     private void initViews() {
-        TextView titleText = findViewById(R.id.mix_ratio_name);
-        titleText.setText(mixRatioName);
+        mixRatioNameTextView = findViewById(R.id.mix_ratio_name);
+        mixRatioNameTextView.setText(mixRatioName);
 
         // 初始化返回按钮
         ImageButton backButton = findViewById(R.id.back_button);
@@ -139,6 +152,87 @@ public class MixRatioEditActivity extends AppCompatActivity {
                 showToast("配比总和已达到100%，无法添加新原料");
             }
         });
+    }
+
+    private void setupNameEditListener() {
+        mixRatioNameTextView.setOnClickListener(v -> showNameEditDialog());
+    }
+
+    private void showNameEditDialog() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("编辑配比名称");
+
+        // 创建输入框
+        final TextInputLayout inputLayout = new TextInputLayout(this);
+        final TextInputEditText input = new TextInputEditText(inputLayout.getContext());
+        
+        // 配置输入框
+        input.setText(mixRatioName);
+        input.setHint("请输入配比名称");
+        input.setMaxLines(1);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        
+        // 添加输入验证
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String text = s.toString().trim();
+                if (text.isEmpty()) {
+                    inputLayout.setError("配比名称不能为空");
+                } else if (text.length() > 20) {
+                    inputLayout.setError("配比名称不能超过20个字符");
+                } else {
+                    inputLayout.setError(null);
+                }
+            }
+        });
+
+        // 软键盘完成按钮监听
+        input.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                String newName = input.getText().toString().trim();
+                if (!newName.isEmpty() && newName.length() <= 20) {
+                    mixRatioName = newName;
+                    mixRatioNameTextView.setText(mixRatioName);
+                    updatePieChart();
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        inputLayout.addView(input);
+        inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
+        
+        builder.setView(inputLayout);
+
+        // 确认和取消按钮
+        builder.setPositiveButton("确定", (dialog, which) -> {
+            String newName = input.getText().toString().trim();
+            if (!newName.isEmpty() && newName.length() <= 20) {
+                mixRatioName = newName;
+                mixRatioNameTextView.setText(mixRatioName);
+                updatePieChart(); // 更新饼图标题
+            }
+        });
+        builder.setNegativeButton("取消", null);
+
+        android.app.AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(dialogInterface -> {
+            // 弹出软键盘
+            input.requestFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+        });
+
+        dialog.show();
     }
 
     private boolean validateMaterials() {
@@ -229,8 +323,43 @@ public class MixRatioEditActivity extends AppCompatActivity {
     }
 
     private void updatePieChart() {
+        if (pieChart == null) return;
+
+        // 如果没有材料，显示100%未分配的饼图
+        if (materials == null || materials.isEmpty()) {
+            List<PieEntry> entries = new ArrayList<>();
+            entries.add(new PieEntry(100f, "未分配"));
+
+            PieDataSet dataSet = new PieDataSet(entries, "");
+            dataSet.setColors(Color.LTGRAY);
+            dataSet.setValueTextSize(14f);
+            dataSet.setValueTextColor(Color.WHITE);
+
+            PieData data = new PieData(dataSet);
+            data.setValueFormatter(new PercentFormatter());
+
+            pieChart.setCenterText(mixRatioName);
+            pieChart.setCenterTextSize(16f);
+            pieChart.setCenterTextColor(Color.BLACK);
+            pieChart.setEntryLabelColor(Color.WHITE);
+            pieChart.setData(data);
+            pieChart.invalidate();
+            return;
+        }
+
         List<PieEntry> entries = new ArrayList<>();
+        int[] colorArray = getChartColors();
+        List<Integer> colors = new ArrayList<>();
+        for (int color : colorArray) {
+            colors.add(color);
+        }
+
         float totalPercentage = 0;
+
+        // 使用mixRatioName作为饼图标题
+        pieChart.setCenterText(mixRatioName);
+        pieChart.setCenterTextSize(16f);
+        pieChart.setCenterTextColor(Color.BLACK);
 
         // 添加已有材料
         for (MaterialItem material : materials) {
@@ -246,7 +375,7 @@ public class MixRatioEditActivity extends AppCompatActivity {
         }
 
         PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setColors(getChartColors());
+        dataSet.setColors(colors);
         dataSet.setValueTextSize(14f);
         dataSet.setValueTextColor(Color.rgb(64, 64, 64)); // 改为深灰色
         dataSet.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
@@ -313,11 +442,11 @@ public class MixRatioEditActivity extends AppCompatActivity {
         }
 
         // 保存到数据库
-        AppDatabase db = AppDatabase.getInstance(this);
+        DatabaseHelper db = DatabaseHelper.getInstance(this);
         new Thread(() -> {
             try {
                 Log.d(TAG, "正在执行数据库插入操作");
-                long id = db.mixRatioDao().insert(mixRatio);
+                long id = db.insertMixRatio(mixRatio);
                 Log.d(TAG, "配比保存成功，ID：" + id);
                 
                 // 在主线程显示成功提示并返回

@@ -4,22 +4,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
 import com.example.labdata_main.model.Project;
 
-public class ExperimentTaskSetupActivity extends AppCompatActivity {
+public class ExperimentTaskSetupActivity extends AppCompatActivity implements AddProjectBottomSheet.OnProjectAddedListener {
     private ViewPager2 viewPager;
-    private TabLayout tabLayout;
     private MaterialButton btnNext;
-    private MaterialButton btnCancel;
     private String taskName;
     private Project selectedProject;
+
+    // 步骤导航视图
+    private TextView[] stepCircles;
+    private TextView[] stepTexts;
+    private View[] stepLines;
+    private int currentStep = 0;
+    private final int TOTAL_STEPS = 4;
 
     public static void start(Context context, String taskName) {
         Intent intent = new Intent(context, ExperimentTaskSetupActivity.class);
@@ -56,84 +61,85 @@ public class ExperimentTaskSetupActivity extends AppCompatActivity {
 
         // 初始化视图
         viewPager = findViewById(R.id.viewPager);
-        tabLayout = findViewById(R.id.tabLayout);
         btnNext = findViewById(R.id.btnNext);
-        btnCancel = findViewById(R.id.btnCancel);
 
-        // 确保所有必要的视图都已找到
-        if (viewPager == null || tabLayout == null || btnNext == null || btnCancel == null) {
-            throw new IllegalStateException("Required views not found. Check your layout file.");
+        // 初始化步骤导航
+        stepCircles = new TextView[TOTAL_STEPS];
+        stepTexts = new TextView[TOTAL_STEPS];
+        stepLines = new View[TOTAL_STEPS - 1];
+
+        for (int i = 0; i < TOTAL_STEPS; i++) {
+            stepCircles[i] = findViewById(getResources().getIdentifier("step" + (i + 1) + "Circle", "id", getPackageName()));
+            stepTexts[i] = findViewById(getResources().getIdentifier("step" + (i + 1) + "Text", "id", getPackageName()));
+            if (i < TOTAL_STEPS - 1) {
+                stepLines[i] = findViewById(getResources().getIdentifier("step" + (i + 1) + "Line", "id", getPackageName()));
+            }
         }
+
+        updateStepIndicators();
     }
 
     private void setupViewPager() {
         ExperimentTaskPagerAdapter adapter = new ExperimentTaskPagerAdapter(this);
         viewPager.setAdapter(adapter);
-        viewPager.setUserInputEnabled(false); // 禁止滑动切换
+        viewPager.setUserInputEnabled(true); // 启用滑动切换
 
-        new TabLayoutMediator(tabLayout, viewPager,
-            (tab, position) -> {
-                switch (position) {
-                    case 0:
-                        tab.setText("选择项目");
-                        break;
-                    case 1:
-                        tab.setText("选择配比");
-                        break;
-                    case 2:
-                        tab.setText("制件方式");
-                        break;
-                    case 3:
-                        tab.setText("实验指派");
-                        break;
-                }
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                currentStep = position;
+                updateStepIndicators();
+                updateNextButton();
             }
-        ).attach();
+        });
     }
 
     private void setupClickListeners() {
-        // 设置取消按钮点击事件
-        btnCancel.setOnClickListener(v -> finish());
-        
-        // 设置下一步按钮点击事件
         btnNext.setOnClickListener(v -> {
-            int currentItem = viewPager.getCurrentItem();
-            if (currentItem < 3) { // 最后一页是3
-                viewPager.setCurrentItem(currentItem + 1);
-                updateNextButtonState(currentItem + 1);
+            if (currentStep < TOTAL_STEPS - 1) {
+                viewPager.setCurrentItem(currentStep + 1);
             } else {
-                // TODO: 保存并完成
+                // 完成设置
                 finish();
             }
         });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-            return true;
+    private void updateStepIndicators() {
+        for (int i = 0; i < TOTAL_STEPS; i++) {
+            if (i < currentStep) {
+                // 已完成的步骤
+                stepCircles[i].setBackgroundResource(R.drawable.step_circle_completed);
+                stepCircles[i].setTextColor(getResources().getColor(android.R.color.white));
+                stepTexts[i].setTextColor(getResources().getColor(R.color.step_text_active));
+                if (i < TOTAL_STEPS - 1) {
+                    stepLines[i].setBackgroundColor(getResources().getColor(R.color.step_line_active));
+                }
+            } else if (i == currentStep) {
+                // 当前步骤
+                stepCircles[i].setBackgroundResource(R.drawable.step_circle_active);
+                stepCircles[i].setTextColor(getResources().getColor(android.R.color.white));
+                stepTexts[i].setTextColor(getResources().getColor(R.color.step_text_active));
+                if (i < TOTAL_STEPS - 1) {
+                    stepLines[i].setBackgroundColor(getResources().getColor(R.color.step_line_inactive));
+                }
+            } else {
+                // 未完成的步骤
+                stepCircles[i].setBackgroundResource(R.drawable.step_circle_inactive);
+                stepCircles[i].setTextColor(getResources().getColor(R.color.step_text_inactive));
+                stepTexts[i].setTextColor(getResources().getColor(R.color.step_text_inactive));
+                if (i < TOTAL_STEPS - 1) {
+                    stepLines[i].setBackgroundColor(getResources().getColor(R.color.step_line_inactive));
+                }
+            }
         }
-        return super.onOptionsItemSelected(item);
     }
 
-    private void updateNextButtonState(int currentPage) {
-        switch (currentPage) {
-            case 0: // 选择项目页面
-                enableNextButton(selectedProject != null);
-                break;
-            case 1: // 选择配比页面
-                // TODO: 根据配比选择状态更新按钮
-                enableNextButton(true);
-                break;
-            case 2: // 制件方式页面
-                // TODO: 根据制件方式选择状态更新按钮
-                enableNextButton(true);
-                break;
-            case 3: // 实验指派页面
-                btnNext.setText("完成");
-                enableNextButton(true);
-                break;
+    private void updateNextButton() {
+        if (currentStep == TOTAL_STEPS - 1) {
+            btnNext.setText("完成");
+        } else {
+            btnNext.setText("下一步");
         }
     }
 
@@ -143,12 +149,24 @@ public class ExperimentTaskSetupActivity extends AppCompatActivity {
         }
     }
 
-    public void setSelectedProject(Project project) {
-        this.selectedProject = project;
-        enableNextButton(project != null);
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
-    public Project getSelectedProject() {
-        return selectedProject;
+    public void setSelectedProject(Project project) {
+        this.selectedProject = project;
+        enableNextButton(true);
+        // TODO: 更新项目列表的显示
+    }
+
+    @Override
+    public void onProjectAdded(Project project) {
+        // 当新项目添加后，更新选中的项目
+        setSelectedProject(project);
     }
 }

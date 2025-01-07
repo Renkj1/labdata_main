@@ -3,6 +3,8 @@ package com.example.labdata_main;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -13,16 +15,19 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-import com.example.labdata_main.data.AppDatabase;
-import com.example.labdata_main.data.MaterialDao;
-import com.example.labdata_main.data.MaterialProperty;
-import com.example.labdata_main.data.MixDesign;
+import com.example.labdata_main.database.AppDatabase;
+import com.example.labdata_main.dao.MaterialDao;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.slider.Slider;
 import com.google.android.material.tabs.TabLayout;
+import com.example.labdata_main.model.MaterialProperty;
+import com.example.labdata_main.database.DatabaseHelper;
+import com.example.labdata_main.model.MixDesign;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MaterialSelectionActivity extends AppCompatActivity {
     private TabLayout materialTypeTabs;
@@ -42,6 +47,9 @@ public class MaterialSelectionActivity extends AppCompatActivity {
     private String selectedMaterialType;
     private String selectedGradation;
     private MaterialProperty selectedProperty;
+
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,18 +210,23 @@ public class MaterialSelectionActivity extends AppCompatActivity {
         }
 
         // 从数据库加载材料属性
-        List<MaterialProperty> properties = materialDao.getPropertiesByType(selectedMaterialType);
-        if (properties.size() > 0) {
-            if (selectedMaterialType.equals("sand")) {
-                // 沙子只有一种属性，直接选中
-                selectedProperty = properties.get(0);
-                materialName.setText(selectedProperty.name);
-                materialBatch.setText("编号：" + selectedProperty.code);
-                materialPropertyContainer.setVisibility(View.GONE);
-            } else {
-                setupPropertyCards(properties);
-            }
-        }
+        executorService.execute(() -> {
+            DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this);
+            List<MaterialProperty> properties = databaseHelper.getMaterialPropertiesByType(selectedMaterialType);
+            mainHandler.post(() -> {
+                if (properties.size() > 0) {
+                    if (selectedMaterialType.equals("sand")) {
+                        // 沙子只有一种属性，直接选中
+                        selectedProperty = properties.get(0);
+                        materialName.setText(selectedProperty.name);
+                        materialBatch.setText("编号：" + selectedProperty.code);
+                        materialPropertyContainer.setVisibility(View.GONE);
+                    } else {
+                        setupPropertyCards(properties);
+                    }
+                }
+            });
+        });
     }
 
     private void updateGradationVisibility(boolean show) {
@@ -265,36 +278,52 @@ public class MaterialSelectionActivity extends AppCompatActivity {
     }
 
     private void saveAndReturn() {
-        // 创建配比设计记录
-        MixDesign design = new MixDesign();
-        design.materialType = selectedMaterialType;
-        design.materialName = selectedProperty.name;
-        design.materialCode = selectedProperty.code;
-        design.gradation = selectedGradation;
-        design.percentage = percentageSlider.getValue();
-        design.timestamp = System.currentTimeMillis();
-        
-        // 如果是新的配比方案（剩余百分比为0），获取新的组号
-        if (maxAvailablePercentage == percentageSlider.getValue()) {
-            int newGroup = materialDao.getLatestDesignGroup() + 1;
-            design.designGroup = newGroup;
-        } else {
-            // 使用传入的现有组号
-            design.designGroup = getIntent().getIntExtra("designGroup", 1);
-        }
-        
-        // 保存到数据库
-        materialDao.insertMixDesign(design);
+        executorService.execute(() -> {
+            try {
+                // 获取最新的设计组号
+                int newGroup = materialDao.getLatestDesignGroup() + 1;
 
-        // 返回结果
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("materialType", selectedMaterialType);
-        resultIntent.putExtra("materialName", selectedProperty.name);
-        resultIntent.putExtra("materialCode", selectedProperty.code);
-        resultIntent.putExtra("gradation", selectedGradation);
-        resultIntent.putExtra("percentage", percentageSlider.getValue());
-        resultIntent.putExtra("designGroup", design.designGroup);
-        setResult(RESULT_OK, resultIntent);
-        finish();
+                // 创建混合设计
+                MixDesign design = new MixDesign();
+                design.setDesignGroup(newGroup);
+                design.setMaterialType(selectedMaterialType);
+                design.setMaterialName(selectedProperty.name);
+                design.setMaterialCode(selectedProperty.code);
+                design.setGradation(selectedGradation);
+                design.setPercentage(percentageSlider.getValue());
+                design.setTimestamp(System.currentTimeMillis());
+                design.setProportion(percentageSlider.getValue() / 100.0);
+
+                // 插入混合设计
+                materialDao.insertMixDesign(design);
+
+                // 在主线程更新UI
+                mainHandler.post(() -> {
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("materialType", selectedMaterialType);
+                    resultIntent.putExtra("materialName", selectedProperty.name);
+                    resultIntent.putExtra("materialCode", selectedProperty.code);
+                    resultIntent.putExtra("designGroup", design.getDesignGroup());
+                    resultIntent.putExtra("gradation", selectedGradation);
+                    resultIntent.putExtra("percentage", percentageSlider.getValue());
+
+                    setResult(RESULT_OK, resultIntent);
+                    finish();
+                });
+            } catch (Exception e) {
+                // 在主线程显示错误
+                mainHandler.post(() -> {
+                    Toast.makeText(this, "保存失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (executorService != null) {
+            executorService.shutdown();
+        }
     }
 }

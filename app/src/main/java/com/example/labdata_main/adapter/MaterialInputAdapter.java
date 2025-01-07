@@ -43,7 +43,7 @@ public class MaterialInputAdapter extends RecyclerView.Adapter<MaterialInputAdap
     public void onBindViewHolder(@NonNull MaterialInputViewHolder holder, int position) {
         MaterialItem material = materials.get(position);
         holder.bind(material);
-        
+
         holder.btnDelete.setOnClickListener(v -> {
             materials.remove(position);
             notifyItemRemoved(position);
@@ -74,9 +74,9 @@ public class MaterialInputAdapter extends RecyclerView.Adapter<MaterialInputAdap
             // 设置材料选择器
             if (actvMaterial.getAdapter() == null) {
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                    itemView.getContext(),
-                    android.R.layout.simple_dropdown_item_1line,
-                    new String[]{"水泥", "砂", "石", "水", "外加剂"}
+                        itemView.getContext(),
+                        android.R.layout.simple_dropdown_item_1line,
+                        new String[]{"水泥", "砂", "石", "水", "外加剂"}
                 );
                 actvMaterial.setAdapter(adapter);
             }

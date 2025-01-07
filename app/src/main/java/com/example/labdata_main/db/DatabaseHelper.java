@@ -753,4 +753,66 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return mixRatios;
     }
+
+    /**
+     * 删除项目
+     * @param projectId 要删除的项目ID
+     * @return 是否删除成功
+     */
+    public boolean deleteProject(int projectId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // 开始事务
+            db.beginTransaction();
+            
+            // 删除项目访问权限记录
+            db.delete(TABLE_PROJECT_ACCESS, COLUMN_PROJECT_ID + " = ?", 
+                    new String[]{String.valueOf(projectId)});
+            
+            // 删除项目
+            int result = db.delete(TABLE_PROJECTS, COLUMN_PROJECT_ID + " = ?", 
+                    new String[]{String.valueOf(projectId)});
+            
+            // 提交事务
+            db.setTransactionSuccessful();
+            
+            return result > 0;
+        } catch (Exception e) {
+            Log.e(TAG, "Error deleting project: " + e.getMessage());
+            return false;
+        } finally {
+            // 结束事务
+            db.endTransaction();
+        }
+    }
+
+    /**
+     * 批量更新项目访问权限
+     * @param projects 要更新的项目列表
+     * @return 是否更新成功
+     */
+    public boolean updateProjectsAccess(List<Project> projects) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            db.beginTransaction();
+            
+            for (Project project : projects) {
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_IS_ACCESSIBLE, project.isAccessible() ? 1 : 0);
+                
+                db.update(TABLE_PROJECTS, 
+                         values,
+                         COLUMN_PROJECT_ID + " = ?",
+                         new String[]{String.valueOf(project.getId())});
+            }
+            
+            db.setTransactionSuccessful();
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating projects access: " + e.getMessage());
+            return false;
+        } finally {
+            db.endTransaction();
+        }
+    }
 }

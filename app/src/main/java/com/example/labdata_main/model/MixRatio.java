@@ -22,13 +22,16 @@ public class MixRatio {
 
     @ColumnInfo(name = "creation_time")
     private long creationTime;
-    
+
     @ColumnInfo(name = "project_id")
     private long projectId;
-    
+
     @TypeConverters(Converters.class)
     @ColumnInfo(name = "materials")
     private List<MaterialItem> materials;
+
+    @ColumnInfo(name = "total_amount")
+    private String totalAmount;
 
     // 默认构造函数，Room 将使用这个
     public MixRatio() {
@@ -80,5 +83,13 @@ public class MixRatio {
 
     public void setMaterials(List<MaterialItem> materials) {
         this.materials = materials;
+    }
+
+    public String getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(String totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

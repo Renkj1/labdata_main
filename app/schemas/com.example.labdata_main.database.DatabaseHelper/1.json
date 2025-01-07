@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "c622e71ff605cd00328da7d34e5105f2",
+    "identityHash": "7b607f2e765e14611c43e33af78ac625",
     "entities": [
       {
         "tableName": "projects",
@@ -56,7 +56,7 @@
       },
       {
         "tableName": "mix_ratios",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `description` TEXT, `creation_time` INTEGER NOT NULL, `project_id` INTEGER NOT NULL, `materials` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `description` TEXT, `creation_time` INTEGER NOT NULL, `project_id` INTEGER NOT NULL, `materials` TEXT, `total_amount` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -91,6 +91,12 @@
           {
             "fieldPath": "materials",
             "columnName": "materials",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "totalAmount",
+            "columnName": "total_amount",
             "affinity": "TEXT",
             "notNull": false
           }
@@ -141,12 +147,124 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "material_properties",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT, `name` TEXT, `unit` TEXT, `code` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "mix_designs",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `designGroup` INTEGER NOT NULL, `materialType` TEXT, `materialName` TEXT, `materialCode` TEXT, `proportion` REAL NOT NULL, `gradation` TEXT, `percentage` REAL NOT NULL, `timestamp` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "designGroup",
+            "columnName": "designGroup",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "materialType",
+            "columnName": "materialType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "materialName",
+            "columnName": "materialName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "materialCode",
+            "columnName": "materialCode",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "proportion",
+            "columnName": "proportion",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gradation",
+            "columnName": "gradation",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "percentage",
+            "columnName": "percentage",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c622e71ff605cd00328da7d34e5105f2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7b607f2e765e14611c43e33af78ac625')"
     ]
   }
 }

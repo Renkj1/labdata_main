@@ -7,28 +7,182 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@android:color/transparent"
             app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationIconTint="@color/black"
             app:title="实验任务设置"
-            app:titleTextColor="@color/white" />
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            app:tabGravity="fill"
-            app:tabMode="fixed"
-            app:tabSelectedTextColor="@color/white"
-            app:tabTextColor="@color/white" />
+            app:titleTextAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            app:titleTextColor="@color/black" />
 
     </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- 步进导航 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:elevation="1dp"
+        android:paddingVertical="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="24dp"
+            android:gravity="center">
+
+            <!-- 步骤1 -->
+            <LinearLayout
+                android:id="@+id/step1Layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/step1Circle"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/step_circle_active"
+                    android:gravity="center"
+                    android:text="1"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/step1Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="选择项目"
+                    android:textColor="@color/step_text_active"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"/>
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/step1Line"
+                android:layout_width="24dp"
+                android:layout_height="1dp"
+                android:background="@color/step_line_inactive"
+                android:layout_gravity="center_vertical"/>
+
+            <!-- 步骤2 -->
+            <LinearLayout
+                android:id="@+id/step2Layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/step2Circle"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/step_circle_inactive"
+                    android:gravity="center"
+                    android:text="2"
+                    android:textColor="@color/step_text_inactive"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/step2Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="选择配比"
+                    android:textColor="@color/step_text_inactive"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"/>
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/step2Line"
+                android:layout_width="24dp"
+                android:layout_height="1dp"
+                android:background="@color/step_line_inactive"
+                android:layout_gravity="center_vertical"/>
+
+            <!-- 步骤3 -->
+            <LinearLayout
+                android:id="@+id/step3Layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/step3Circle"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/step_circle_inactive"
+                    android:gravity="center"
+                    android:text="3"
+                    android:textColor="@color/step_text_inactive"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/step3Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="制件方式"
+                    android:textColor="@color/step_text_inactive"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"/>
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/step3Line"
+                android:layout_width="24dp"
+                android:layout_height="1dp"
+                android:background="@color/step_line_inactive"
+                android:layout_gravity="center_vertical"/>
+
+            <!-- 步骤4 -->
+            <LinearLayout
+                android:id="@+id/step4Layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/step4Circle"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/step_circle_inactive"
+                    android:gravity="center"
+                    android:text="4"
+                    android:textColor="@color/step_text_inactive"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/step4Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="实验指派"
+                    android:textColor="@color/step_text_inactive"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -40,35 +194,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <LinearLayout
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_margin="16dp"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCancel"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:text="取消"
-                android:textSize="16sp"
-                app:cornerRadius="8dp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnNext"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:text="下一步"
-                android:textSize="16sp"
-                app:cornerRadius="8dp" />
-
-        </LinearLayout>
+            android:minHeight="56dp"
+            android:text="下一步"
+            android:textSize="16sp"
+            app:cornerRadius="28dp"
+            app:elevation="2dp" />
 
     </FrameLayout>
 

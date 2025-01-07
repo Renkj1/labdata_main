@@ -5,17 +5,13 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
+
 import com.example.labdata_main.model.MixRatio;
+
 import java.util.List;
 
 @Dao
 public interface MixRatioDao {
-    @Query("SELECT * FROM mix_ratios")
-    List<MixRatio> getAllMixRatios();
-
-    @Query("SELECT * FROM mix_ratios WHERE id = :id")
-    MixRatio getMixRatioById(long id);
-
     @Insert
     long insert(MixRatio mixRatio);
 
@@ -24,4 +20,10 @@ public interface MixRatioDao {
 
     @Delete
     void delete(MixRatio mixRatio);
+
+    @Query("SELECT * FROM mix_ratios ORDER BY id DESC")
+    List<MixRatio> getAllMixRatios();
+
+    @Query("SELECT * FROM mix_ratios WHERE id = :id")
+    MixRatio getMixRatioById(long id);
 }

@@ -1,5 +1,6 @@
 package com.example.labdata_main;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.labdata_main.adapter.ProjectSelectionAdapter;
 import com.example.labdata_main.db.DatabaseHelper;
 import com.example.labdata_main.model.Project;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.card.MaterialCardView;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,6 @@ public class SelectProjectFragment extends Fragment implements
         AddProjectBottomSheet.OnProjectAddedListener {
     
     private RecyclerView rvProjects;
-    private FloatingActionButton fabAddProject;
     private ProjectSelectionAdapter adapter;
     private DatabaseHelper databaseHelper;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -40,10 +40,16 @@ public class SelectProjectFragment extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_select_project, container, false);
 
         rvProjects = view.findViewById(R.id.rvProjects);
-        fabAddProject = view.findViewById(R.id.fabAddProject);
+        MaterialCardView addProjectCard = view.findViewById(R.id.addProjectCard);
 
         setupRecyclerView();
-        setupClickListeners();
+        
+        // 设置添加项目卡片点击事件
+        addProjectCard.setOnClickListener(v -> {
+            AddProjectBottomSheet bottomSheet = AddProjectBottomSheet.newInstance();
+            bottomSheet.setOnProjectAddedListener(this);
+            bottomSheet.show(getChildFragmentManager(), "AddProjectBottomSheet");
+        });
 
         return view;
     }
@@ -60,14 +66,6 @@ public class SelectProjectFragment extends Fragment implements
         rvProjects.setAdapter(adapter);
     }
 
-    private void setupClickListeners() {
-        fabAddProject.setOnClickListener(v -> {
-            AddProjectBottomSheet bottomSheet = AddProjectBottomSheet.newInstance();
-            bottomSheet.setOnProjectAddedListener(this);
-            bottomSheet.show(getChildFragmentManager(), "AddProjectBottomSheet");
-        });
-    }
-
     private void loadProjects() {
         new Thread(() -> {
             List<Project> projects = databaseHelper.getAllProjects();
@@ -82,8 +80,22 @@ public class SelectProjectFragment extends Fragment implements
         if (getActivity() instanceof ExperimentTaskSetupActivity) {
             ExperimentTaskSetupActivity activity = (ExperimentTaskSetupActivity) getActivity();
             activity.setSelectedProject(project);
-            activity.enableNextButton(true);
         }
+    }
+
+    @Override
+    public void onProjectDeleteRequested(Project project) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("删除项目")
+                .setMessage("确定要删除项目 \"" + project.getName() + "\" 吗？")
+                .setPositiveButton("删除", (dialog, which) -> {
+                    new Thread(() -> {
+                        databaseHelper.deleteProject(project.getId());
+                        mainHandler.post(this::loadProjects);
+                    }).start();
+                })
+                .setNegativeButton("取消", null)
+                .show();
     }
 
     @Override

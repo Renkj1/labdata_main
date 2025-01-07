@@ -1,73 +1,98 @@
 package com.example.labdata_main.model;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "molding_methods")
 public class MoldingMethod {
     public static final int TYPE_CUBE = 1;
     public static final int TYPE_CYLINDER = 2;
     public static final int TYPE_PRISM = 3;
 
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    private long id;
+
+    @ColumnInfo(name = "type")
     private int type;
+
+    @ColumnInfo(name = "size")
     private float size;        // 立方体边长
+
+    @ColumnInfo(name = "diameter")
     private float diameter;    // 圆柱体直径
+
+    @ColumnInfo(name = "length")
     private float length;      // 棱柱体长度
+
+    @ColumnInfo(name = "width")
     private float width;       // 棱柱体宽度
+
+    @ColumnInfo(name = "height")
     private float height;      // 圆柱体/棱柱体高度
+
+    @ColumnInfo(name = "count")
     private int count;        // 试块数量
 
-    public int getType() {
-        return type;
+    @ColumnInfo(name = "mixing_temperature")
+    private float mixingTemperature;
+
+    @ColumnInfo(name = "mixing_speed")
+    private float mixingSpeed;
+
+    @ColumnInfo(name = "mixing_time")
+    private float mixingTime;
+
+    @ColumnInfo(name = "compaction_method")
+    private String compactionMethod;
+
+    public MoldingMethod() {}
+
+    @Ignore
+    public MoldingMethod(float mixingTemperature, float mixingSpeed, float mixingTime, String compactionMethod) {
+        this.mixingTemperature = mixingTemperature;
+        this.mixingSpeed = mixingSpeed;
+        this.mixingTime = mixingTime;
+        this.compactionMethod = compactionMethod;
     }
 
-    public void setType(int type) {
-        this.type = type;
-    }
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
 
-    public float getSize() {
-        return size;
-    }
+    public int getType() { return type; }
+    public void setType(int type) { this.type = type; }
 
-    public void setSize(float size) {
-        this.size = size;
-    }
+    public float getSize() { return size; }
+    public void setSize(float size) { this.size = size; }
 
-    public float getDiameter() {
-        return diameter;
-    }
+    public float getDiameter() { return diameter; }
+    public void setDiameter(float diameter) { this.diameter = diameter; }
 
-    public void setDiameter(float diameter) {
-        this.diameter = diameter;
-    }
+    public float getLength() { return length; }
+    public void setLength(float length) { this.length = length; }
 
-    public float getLength() {
-        return length;
-    }
+    public float getWidth() { return width; }
+    public void setWidth(float width) { this.width = width; }
 
-    public void setLength(float length) {
-        this.length = length;
-    }
+    public float getHeight() { return height; }
+    public void setHeight(float height) { this.height = height; }
 
-    public float getWidth() {
-        return width;
-    }
+    public int getCount() { return count; }
+    public void setCount(int count) { this.count = count; }
 
-    public void setWidth(float width) {
-        this.width = width;
-    }
+    public float getMixingTemperature() { return mixingTemperature; }
+    public void setMixingTemperature(float mixingTemperature) { this.mixingTemperature = mixingTemperature; }
 
-    public float getHeight() {
-        return height;
-    }
+    public float getMixingSpeed() { return mixingSpeed; }
+    public void setMixingSpeed(float mixingSpeed) { this.mixingSpeed = mixingSpeed; }
 
-    public void setHeight(float height) {
-        this.height = height;
-    }
+    public float getMixingTime() { return mixingTime; }
+    public void setMixingTime(float mixingTime) { this.mixingTime = mixingTime; }
 
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
+    public String getCompactionMethod() { return compactionMethod; }
+    public void setCompactionMethod(String compactionMethod) { this.compactionMethod = compactionMethod; }
 
     @Override
     public String toString() {
