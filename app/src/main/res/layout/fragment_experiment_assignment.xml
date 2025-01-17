@@ -11,108 +11,20 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <com.google.android.material.card.MaterialCardView
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="2dp">
+            android:text="实验指派"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginBottom="16dp"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="实验类型"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"
-                    android:layout_marginBottom="16dp"/>
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipGroupExperiments"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:singleSelection="false">
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipCompression"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="抗压强度"
-                        style="@style/Widget.MaterialComponents.Chip.Filter"/>
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipFlexural"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="抗折强度"
-                        style="@style/Widget.MaterialComponents.Chip.Filter"/>
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipSplitting"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="劈裂抗拉"
-                        style="@style/Widget.MaterialComponents.Chip.Filter"/>
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipElastic"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="弹性模量"
-                        style="@style/Widget.MaterialComponents.Chip.Filter"/>
-
-                </com.google.android.material.chip.ChipGroup>
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="2dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="备注说明"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"
-                    android:layout_marginBottom="16dp"/>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etNotes"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="添加备注说明"
-                        android:inputType="textMultiLine"
-                        android:minLines="3"
-                        android:gravity="top"/>
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
+            android:nestedScrollingEnabled="false"/>
 
     </LinearLayout>
 

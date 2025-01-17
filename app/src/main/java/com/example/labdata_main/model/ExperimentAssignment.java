@@ -1,13 +1,17 @@
 package com.example.labdata_main.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ExperimentAssignment {
     public static final String EXPERIMENT_COMPRESSION = "compression";
     public static final String EXPERIMENT_FLEXURAL = "flexural";
     public static final String EXPERIMENT_SPLITTING = "splitting";
     public static final String EXPERIMENT_ELASTIC = "elastic";
+    public static final String EXPERIMENT_MARSHALL = "marshall";
+    public static final String EXPERIMENT_BEAM = "beam";
 
     private List<String> experimentTypes;
     private String notes;
@@ -61,6 +65,12 @@ public class ExperimentAssignment {
                     break;
                 case EXPERIMENT_ELASTIC:
                     experimentNames.add("弹性模量");
+                    break;
+                case EXPERIMENT_MARSHALL:
+                    experimentNames.add("马歇尔试验");
+                    break;
+                case EXPERIMENT_BEAM:
+                    experimentNames.add("梁试验");
                     break;
             }
         }
