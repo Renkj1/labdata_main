@@ -15,7 +15,6 @@ import com.google.android.material.textfield.TextInputEditText;
 
 public class ExperimentAssignmentFragment extends Fragment {
     private ChipGroup chipGroupExperiments;
-    private ChipGroup chipGroupAges;
     private TextInputEditText etNotes;
     
     private Chip chipCompression;
@@ -36,7 +35,6 @@ public class ExperimentAssignmentFragment extends Fragment {
 
     private void initViews(View view) {
         chipGroupExperiments = view.findViewById(R.id.chipGroupExperiments);
-        chipGroupAges = view.findViewById(R.id.chipGroupAges);
         etNotes = view.findViewById(R.id.etNotes);
         
         chipCompression = view.findViewById(R.id.chipCompression);
@@ -49,15 +47,10 @@ public class ExperimentAssignmentFragment extends Fragment {
         chipGroupExperiments.setOnCheckedStateChangeListener((group, checkedIds) -> {
             checkInputValidity();
         });
-
-        chipGroupAges.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            checkInputValidity();
-        });
     }
 
     private void checkInputValidity() {
-        boolean isValid = chipGroupExperiments.getCheckedChipIds().size() > 0 &&
-                         chipGroupAges.getCheckedChipIds().size() > 0;
+        boolean isValid = chipGroupExperiments.getCheckedChipIds().size() > 0;
         
         // 通知Activity更新下一步按钮状态
         ((ExperimentTaskSetupActivity) requireActivity()).enableNextButton(isValid);
@@ -78,13 +71,6 @@ public class ExperimentAssignmentFragment extends Fragment {
         }
         if (chipElastic.isChecked()) {
             assignment.addExperimentType(ExperimentAssignment.EXPERIMENT_ELASTIC);
-        }
-        
-        // 获取养护龄期
-        Chip selectedAgeChip = chipGroupAges.findViewById(chipGroupAges.getCheckedChipId());
-        if (selectedAgeChip != null) {
-            String age = selectedAgeChip.getText().toString();
-            assignment.setCuringAge(Integer.parseInt(age.replace("d", "")));
         }
         
         // 获取备注说明

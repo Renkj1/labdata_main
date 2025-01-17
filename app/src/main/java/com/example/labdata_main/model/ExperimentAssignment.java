@@ -10,7 +10,6 @@ public class ExperimentAssignment {
     public static final String EXPERIMENT_ELASTIC = "elastic";
 
     private List<String> experimentTypes;
-    private int curingAge;
     private String notes;
 
     public ExperimentAssignment() {
@@ -33,14 +32,6 @@ public class ExperimentAssignment {
 
     public void removeExperimentType(String type) {
         experimentTypes.remove(type);
-    }
-
-    public int getCuringAge() {
-        return curingAge;
-    }
-
-    public void setCuringAge(int curingAge) {
-        this.curingAge = curingAge;
     }
 
     public String getNotes() {
@@ -66,7 +57,7 @@ public class ExperimentAssignment {
                     experimentNames.add("抗折强度");
                     break;
                 case EXPERIMENT_SPLITTING:
-                    experimentNames.add("劈裂抗拉");
+                    experimentNames.add("劈裂强度");
                     break;
                 case EXPERIMENT_ELASTIC:
                     experimentNames.add("弹性模量");
@@ -74,9 +65,6 @@ public class ExperimentAssignment {
             }
         }
         sb.append(String.join("、", experimentNames));
-        
-        // 添加养护龄期
-        sb.append(String.format(" %dd", curingAge));
         
         return sb.toString();
     }
